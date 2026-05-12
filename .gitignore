@@ -42,3 +42,15 @@ next-env.d.ts
 .meowphyr/
 .playwright-mcp/
 .scannerwork/
+
+# AI rules (internal only)
+AI_RULES.md
+
+# SonarQube
+sonar-issues-detail.txt
+sonar-issues-full.json
+sonar-issues.py
+sonar-project.properties
+
+# Claude
+/.claude

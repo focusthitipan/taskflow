@@ -115,8 +115,8 @@ export function Topbar() {
         <div className="flex items-start gap-3">
           <div className={cn("w-2 h-2 rounded-full mt-1.5 flex-shrink-0", getNotifDotColor(n.type))} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{n.title}</p>
-            <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{n.message}</p>
+            <p className="text-sm font-bold text-secondaryGray-900 dark:text-white break-words">{n.title}</p>
+            <p className="text-xs text-secondaryGray-600 font-normal mt-0.5 break-words">{n.message}</p>
             <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">
               {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
             </p>

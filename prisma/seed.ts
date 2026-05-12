@@ -84,14 +84,14 @@ async function main() {
     },
   });
 
-  const tom = await prisma.user.create({
+  await prisma.user.create({
     data: {
       firstName: "Tom",
       lastName: "Walsh",
       email: "tom@taskflow.io",
       password: viewerPw,
       role: "viewer",
-      status: "inactive",
+      status: "active",
       avatarColor: "#3965FF",
       timezone: "UTC+0",
       language: "en",
@@ -268,21 +268,155 @@ async function main() {
 
   console.log("📋 Created 9 tasks");
 
-  // Create comments
+  // Create comments — spanning entire May 2026
+  const may = (day: number, hour = 9) => new Date(2026, 4, day, hour, 0, 0); // month is 0-indexed
+
   await prisma.comment.createMany({
     data: [
-      {
-        taskId: task1.id,
-        userId: sarah.id,
-        content: "Starting on wireframes today. Will share a draft by end of week.",
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      },
-      {
-        taskId: task4.id,
-        userId: marcus.id,
-        content: "Completed auth endpoints. Moving on to task endpoints.",
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      },
+      // ── Week 1: May 1–3 ──
+      { taskId: task1.id, userId: admin.id,
+        content: "Let's kick off the onboarding redesign. Sarah, can you lead the wireframes?",
+        createdAt: may(1, 10) },
+      { taskId: task1.id, userId: sarah.id,
+        content: "On it! I'll start with user flow mapping today.",
+        createdAt: may(1, 11) },
+      { taskId: task2.id, userId: admin.id,
+        content: "Marcus, this is urgent — we need auth done before the sprint demo on the 8th.",
+        createdAt: may(2, 9) },
+      { taskId: task2.id, userId: marcus.id,
+        content: "Understood. Starting with the JWT token generation module.",
+        createdAt: may(2, 10) },
+      { taskId: task3.id, userId: admin.id,
+        content: "Setting up the initial GitHub Actions config. Will use staging env first.",
+        createdAt: may(3, 14) },
+
+      // ── Week 2: May 4–10 ──
+      { taskId: task1.id, userId: sarah.id,
+        content: "Wireframes v1 ready for review. Sharing the Figma link in the description.",
+        createdAt: may(5, 11) },
+      { taskId: task1.id, userId: priya.id,
+        content: "Looks great Sarah! I have a few suggestions on the sign-up step — will annotate in Figma.",
+        createdAt: may(5, 14) },
+      { taskId: task4.id, userId: sarah.id,
+        content: "Started documenting the REST endpoints. Marcus, can you help with the auth endpoints section?",
+        createdAt: may(6, 9) },
+      { taskId: task4.id, userId: marcus.id,
+        content: "Sure, I'll write up the auth section this afternoon.",
+        createdAt: may(6, 11) },
+      { taskId: task5.id, userId: priya.id,
+        content: "Found 3 critical layout breaks on iPhone SE. Working on fixes now.",
+        createdAt: may(7, 10) },
+      { taskId: task5.id, userId: admin.id,
+        content: "Good catch Priya. Make sure to test Android Chrome too.",
+        createdAt: may(7, 11) },
+      { taskId: task2.id, userId: marcus.id,
+        content: "JWT generation and refresh token rotation done. Moving on to login/register endpoints.",
+        createdAt: may(8, 16) },
+      { taskId: task6.id, userId: admin.id,
+        content: "Initial Lighthouse scores are in — performance is 62 on mobile. We need to aim for 90+.",
+        createdAt: may(9, 10) },
+      { taskId: task6.id, userId: sarah.id,
+        content: "62 is rough. I suspect the hero images and unoptimized JS bundles are the main culprits.",
+        createdAt: may(9, 11) },
+      { taskId: task7.id, userId: sarah.id,
+        content: "Completed all 10 interviews! Summary doc is attached in the description.",
+        createdAt: may(10, 17) },
+      { taskId: task7.id, userId: admin.id,
+        content: "Excellent work Sarah. Let's schedule a findings review meeting next week.",
+        createdAt: may(10, 17) },
+
+      // ── Week 3: May 11–17 ──
+      { taskId: task1.id, userId: sarah.id,
+        content: "Incorporated Priya's feedback. Updated wireframes v2 uploaded.",
+        createdAt: may(12, 9) },
+      { taskId: task4.id, userId: marcus.id,
+        content: "Auth endpoints doc complete. Moving on to task CRUD endpoints.",
+        createdAt: may(12, 15) },
+      { taskId: task8.id, userId: admin.id,
+        content: "Migration script is ready. We'll run it during off-peak hours tonight.",
+        createdAt: may(13, 10) },
+      { taskId: task8.id, userId: marcus.id,
+        content: "I'll monitor the migration and run validation checks after it completes.",
+        createdAt: may(13, 11) },
+      { taskId: task5.id, userId: priya.id,
+        content: "All mobile breakpoints fixed. Running cross-browser regression tests now.",
+        createdAt: may(14, 14) },
+      { taskId: task3.id, userId: admin.id,
+        content: "Staging pipeline is green! Adding production deployment stage next.",
+        createdAt: may(15, 10) },
+      { taskId: task6.id, userId: sarah.id,
+        content: "Lazy-loaded images and code-split the dashboard bundle. Score jumped to 78.",
+        createdAt: may(16, 9) },
+      { taskId: task6.id, userId: admin.id,
+        content: "Good progress. Let's target 85+ by end of sprint. What about font optimization?",
+        createdAt: may(16, 10) },
+      { taskId: task2.id, userId: marcus.id,
+        content: "Login, register, and password reset endpoints all working. Writing tests now.",
+        createdAt: may(17, 16) },
+
+      // ── Week 4: May 18–24 ──
+      { taskId: task8.id, userId: marcus.id,
+        content: "Migration completed successfully. Zero downtime achieved. All data validated.",
+        createdAt: may(18, 8) },
+      { taskId: task8.id, userId: admin.id,
+        content: "Fantastic work Marcus. Marking this as done.",
+        createdAt: may(18, 9) },
+      { taskId: task7.id, userId: sarah.id,
+        content: "Research findings presentation is ready. Key insight: users want a guided tutorial on first login.",
+        createdAt: may(19, 11) },
+      { taskId: task1.id, userId: priya.id,
+        content: "High-fidelity mockups looking good. Should we add an interactive prototype?",
+        createdAt: may(20, 14) },
+      { taskId: task1.id, userId: sarah.id,
+        content: "Yes! I'll build a clickable prototype in Figma by Friday.",
+        createdAt: may(20, 15) },
+      { taskId: task4.id, userId: sarah.id,
+        content: "API docs are about 55% done. On track for the deadline.",
+        createdAt: may(21, 10) },
+      { taskId: task5.id, userId: priya.id,
+        content: "Regression tests passed on all major browsers and devices. Almost there!",
+        createdAt: may(22, 16) },
+      { taskId: task9.id, userId: admin.id,
+        content: "Datadog dashboards configured. PagerDuty alerts are live for CPU > 80% and error rate > 5%.",
+        createdAt: may(23, 10) },
+      { taskId: task9.id, userId: admin.id,
+        content: "All monitors green. Marking monitoring setup as done.",
+        createdAt: may(23, 17) },
+      { taskId: task3.id, userId: admin.id,
+        content: "Production deployment pipeline is live. Auto-deploys on merge to main.",
+        createdAt: may(24, 11) },
+
+      // ── Week 5: May 25–31 ──
+      { taskId: task6.id, userId: sarah.id,
+        content: "Switched to next/font and preloaded critical CSS. Lighthouse score now at 84!",
+        createdAt: may(26, 10) },
+      { taskId: task6.id, userId: admin.id,
+        content: "Great improvement! Let's squeeze a bit more — can we defer non-critical JS?",
+        createdAt: may(26, 11) },
+      { taskId: task2.id, userId: marcus.id,
+        content: "All auth tests passing. Ready for code review.",
+        createdAt: may(27, 14) },
+      { taskId: task4.id, userId: marcus.id,
+        content: "Finished documenting all task endpoints. Sarah, how's the overview section going?",
+        createdAt: may(28, 9) },
+      { taskId: task4.id, userId: sarah.id,
+        content: "Overview and error handling sections are in progress. Should be done by tomorrow.",
+        createdAt: may(28, 10) },
+      { taskId: task1.id, userId: sarah.id,
+        content: "Clickable prototype is ready! Sharing link with the team for feedback.",
+        createdAt: may(29, 16) },
+      { taskId: task1.id, userId: admin.id,
+        content: "Prototype looks amazing. Let's plan a user test session next week.",
+        createdAt: may(29, 17) },
+      { taskId: task5.id, userId: priya.id,
+        content: "One more edge case found on iPad landscape mode. Fixing now.",
+        createdAt: may(30, 10) },
+      { taskId: task3.id, userId: admin.id,
+        content: "Pipeline ran 12 deploys this month with zero failures. Very stable.",
+        createdAt: may(31, 9) },
+      { taskId: task6.id, userId: sarah.id,
+        content: "Deferred analytics and chat widgets. Final Lighthouse score: 91! 🎉",
+        createdAt: may(31, 15) },
     ],
   });
 
@@ -389,11 +523,13 @@ async function main() {
   console.log("✅ Seed complete!");
 }
 
-main()
-  .catch((e) => {
+void (async () => {
+  try {
+    await main();
+  } catch (e) {
     console.error("❌ Seed failed:", e);
     process.exit(1);
-  })
-  .finally(async () => {
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+})();
