@@ -108,18 +108,38 @@ export function Sidebar() {
       )}
     >
       {/* Logo */}
-      <div className="logo-enter flex items-center gap-3 px-5 pt-8 pb-6 flex-shrink-0">
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 gradient-brand"
-        >
-          <Zap className="w-5 h-5 text-white" />
+      {collapsed && !isMobile ? (
+        <div className="logo-enter flex flex-col items-center pt-8 pb-6 gap-2 flex-shrink-0">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center gradient-brand">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <button
+            onClick={toggle}
+            aria-label="Expand sidebar"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white hover:bg-secondaryGray-100 dark:hover:bg-navy-700 transition-colors duration-150"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
-        {(!collapsed || isMobile) && (
-          <span className="text-xl font-bold text-secondaryGray-900 dark:text-white">
+      ) : (
+        <div className="logo-enter flex items-center gap-3 px-5 pt-8 pb-6 flex-shrink-0">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 gradient-brand">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-bold text-secondaryGray-900 dark:text-white flex-1 min-w-0 truncate">
             {workspaceName}
           </span>
-        )}
-      </div>
+          {!isMobile && (
+            <button
+              onClick={toggle}
+              aria-label="Collapse sidebar"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white hover:bg-secondaryGray-100 dark:hover:bg-navy-700 transition-colors duration-150 flex-shrink-0"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
@@ -153,22 +173,6 @@ export function Sidebar() {
           </div>
         ))}
 
-        {/* Collapse toggle — desktop only */}
-        {!isMobile && (
-          <button
-            onClick={toggle}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-[10px] text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
-          >
-            {collapsed ? (
-              <ChevronRight className="w-5 h-5 flex-shrink-0" />
-            ) : (
-              <>
-                <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-normal">{t.nav.collapse}</span>
-              </>
-            )}
-          </button>
-        )}
       </div>
     </div>
   );

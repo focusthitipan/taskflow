@@ -33,6 +33,10 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
   const [form, setForm] = useState({ ...task });
   const [newComment, setNewComment] = useState("");
   const [saving, setSaving] = useState(false);
+  const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [tagsError, setTagsError] = useState("");
+  const [dueDateError, setDueDateError] = useState("");
 
   // Mention autocomplete
   const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([]);
@@ -57,6 +61,30 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
   const dateLocale = locale === "th" ? "th-TH" : "en-US";
 
   const handleSave = async () => {
+    if (!form.title.trim()) {
+      setTitleError(t.dashboard.taskTitleRequired);
+      return;
+    }
+    if (form.title.length > 100) {
+      setTitleError(t.dashboard.taskTitleTooLong);
+      return;
+    }
+    setTitleError("");
+    if ((form.description ?? "").length > 500) {
+      setDescriptionError(t.dashboard.descriptionTooLong);
+      return;
+    }
+    setDescriptionError("");
+    if ((form.tags ?? []).length > 5) {
+      setTagsError(t.dashboard.tooManyTags);
+      return;
+    }
+    setTagsError("");
+    if (form.dueDate && new Date(form.dueDate) < new Date(new Date().toDateString())) {
+      setDueDateError(t.dashboard.dueDatePast);
+      return;
+    }
+    setDueDateError("");
     setSaving(true);
     try {
       const res = await fetch(`/api/tasks/${task.id}`, {
@@ -176,11 +204,21 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
         <div className="flex items-start justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
           <div className="flex-1 min-w-0 pr-4">
             {editing ? (
-              <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full text-xl font-bold text-secondaryGray-900 dark:text-white bg-transparent border-b border-brand-500 pb-1"
-              />
+              <div>
+                <input
+                  value={form.title}
+                  onChange={(e) => { setForm({ ...form, title: e.target.value }); setTitleError(""); }}
+                  className="w-full text-xl font-bold text-secondaryGray-900 dark:text-white bg-transparent border-b border-brand-500 pb-1"
+                />
+                <div className="flex items-center justify-between mt-1">
+                  {titleError ? (
+                    <p className="text-xs text-red-500">{titleError}</p>
+                  ) : <span />}
+                  <p className={`text-xs ${form.title.length > 100 ? "text-red-500" : "text-secondaryGray-600"}`}>
+                    {form.title.length}/100
+                  </p>
+                </div>
+              </div>
             ) : (
               <h2 className="text-xl font-bold text-secondaryGray-900 dark:text-white">
                 {task.title}
@@ -229,7 +267,7 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
             )}
             {!editing && canEdit && (
               <button
-                onClick={() => setEditing(true)}
+                onClick={() => { setEditing(true); setTitleError(""); }}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-brand-500 border border-brand-500/30 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
               >
                 <Edit2 className="w-3.5 h-3.5" />
@@ -252,12 +290,22 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
               {t.dashboard.description}
             </label>
             {editing ? (
-              <textarea
-                value={form.description || ""}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={3}
-                className="w-full rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white p-4 resize-none"
-              />
+              <>
+                <textarea
+                  value={form.description || ""}
+                  onChange={(e) => { setForm({ ...form, description: e.target.value }); setDescriptionError(""); }}
+                  rows={3}
+                  className="w-full rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white p-4 resize-none"
+                />
+                <div className="flex items-center justify-between mt-1">
+                  {descriptionError ? (
+                    <p className="text-xs text-red-500">{descriptionError}</p>
+                  ) : <span />}
+                  <p className={`text-xs ${(form.description ?? "").length > 500 ? "text-red-500" : "text-secondaryGray-600"}`}>
+                    {(form.description ?? "").length}/500
+                  </p>
+                </div>
+              </>
             ) : (
               <p className="text-sm text-secondaryGray-600 font-normal leading-[150%]">
                 {task.description || t.dashboard.noDescription}
@@ -272,14 +320,20 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
                 <Calendar className="w-3.5 h-3.5" /> {t.dashboard.dueDate}
               </label>
               {editing ? (
-                <input
-                  type="date"
-                  value={form.dueDate?.split("T")[0] || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined })
-                  }
-                  className="w-full h-10 px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
-                />
+                <>
+                  <input
+                    type="date"
+                    value={form.dueDate?.split("T")[0] || ""}
+                    onChange={(e) => {
+                      setForm({ ...form, dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined });
+                      setDueDateError("");
+                    }}
+                    className="w-full h-10 px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
+                  />
+                  {dueDateError && (
+                    <p className="text-xs text-red-500 mt-1">{dueDateError}</p>
+                  )}
+                </>
               ) : (
                 <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
                   {task.dueDate
@@ -382,21 +436,26 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
                 <Tag className="w-3.5 h-3.5" /> {t.dashboard.tags}
               </label>
               {editing ? (
-                <input
-                  value={(form.tags || []).join(", ")}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      tags: e.target.value
-                        .split(",")
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  placeholder={t.dashboard.egTags}
-                  className="w-full h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
-                />
-              ) : (
+                <>
+                  <input
+                    value={(form.tags || []).join(", ")}
+                    onChange={(e) => {
+                      setForm({
+                        ...form,
+                        tags: e.target.value
+                          .split(",")
+                          .map((t) => t.trim())
+                          .filter(Boolean),
+                      });
+                      setTagsError("");
+                    }}
+                    placeholder={t.dashboard.egTags}
+                    className="w-full h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
+                  />
+                  {tagsError && (
+                    <p className="text-xs text-red-500 mt-1">{tagsError}</p>
+                  )}
+                </>) : (
                 <div className="flex flex-wrap gap-1">
                   {task.tags && task.tags.length > 0 ? (
                     task.tags.map((tag) => (

@@ -25,12 +25,20 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
   const { t } = useT();
 
   const schema = z.object({
-    firstName: z.string().min(1, t.users.firstNameRequired),
-    lastName: z.string().min(1, t.users.lastNameRequired),
+    firstName: z
+      .string()
+      .min(1, t.users.firstNameRequired)
+      .max(50, t.users.nameTooLong),
+    lastName: z
+      .string()
+      .min(1, t.users.lastNameRequired)
+      .max(50, t.users.nameTooLong),
     email: z.string().email(t.users.invalidEmail),
     role: z.enum(["admin", "member", "viewer"]),
     status: z.enum(["active", "inactive"]),
-    password: z.string().optional(),
+    password: mode === "add"
+      ? z.string().min(1, t.users.passwordRequired).min(8, t.users.passwordTooShort)
+      : z.string().optional(),
   });
 
   type FormData = z.infer<typeof schema>;
@@ -158,7 +166,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
           {mode === "add" && (
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                {t.users.password}
+                {t.users.password} *
               </label>
               <input
                 {...register("password")}
@@ -166,6 +174,9 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
                 placeholder={t.users.tempPassword}
                 className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600"
               />
+              {errors.password && (
+                <p className="text-xs text-red-500 mt-1 ms-[10px]">{errors.password.message}</p>
+              )}
             </div>
           )}
 

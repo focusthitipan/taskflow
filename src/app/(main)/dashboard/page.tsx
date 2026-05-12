@@ -1,8 +1,6 @@
 "use client";
 
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Plus, Clock, Briefcase } from "lucide-react";
@@ -24,7 +22,7 @@ interface PaginationMeta {
   totalPages: number;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { t } = useT();
   const { data: session } = useSession();
   const { workingDays, businessHoursStart, businessHoursEnd } = useWorkspace();
@@ -113,7 +111,7 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Stats row */}
-      <div className="stagger stagger-1 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <div className="stagger stagger-1 grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { label: t.dashboard.toDo, count: counts.todo, color: "text-secondaryGray-600" },
           { label: t.dashboard.inProgress, count: counts.in_progress, color: "text-orange-500" },
@@ -219,5 +217,13 @@ export default function DashboardPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <DashboardContent />
+    </Suspense>
   );
 }

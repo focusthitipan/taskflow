@@ -72,6 +72,10 @@ export interface Translations {
     failedCreateTask: string;
     taskTitle: string;
     taskTitleRequired: string;
+    taskTitleTooLong: string;
+    descriptionTooLong: string;
+    tooManyTags: string;
+    dueDatePast: string;
     description: string;
     priority: string;
     status: string;
@@ -199,7 +203,10 @@ export interface Translations {
     lastName: string;
     firstNameRequired: string;
     lastNameRequired: string;
+    nameTooLong: string;
     invalidEmail: string;
+    passwordRequired: string;
+    passwordTooShort: string;
     password: string;
     tempPassword: string;
     saving: string;

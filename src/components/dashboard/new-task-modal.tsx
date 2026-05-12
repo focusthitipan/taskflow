@@ -25,12 +25,24 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
   const [saving, setSaving] = useState(false);
 
   const schema = z.object({
-    title: z.string().min(1, t.dashboard.taskTitleRequired),
-    description: z.string().optional(),
+    title: z
+      .string()
+      .min(1, t.dashboard.taskTitleRequired)
+      .max(100, t.dashboard.taskTitleTooLong),
+    description: z
+      .string()
+      .max(500, t.dashboard.descriptionTooLong)
+      .optional(),
     priority: z.enum(["urgent", "high", "medium", "low"]),
     status: z.enum(["todo", "in_progress", "done"]),
     project: z.string().optional(),
-    dueDate: z.string().optional(),
+    dueDate: z
+      .string()
+      .optional()
+      .refine(
+        (v) => !v || new Date(v) >= new Date(new Date().toDateString()),
+        t.dashboard.dueDatePast
+      ),
   });
 
   type FormData = z.infer<typeof schema>;
@@ -38,11 +50,15 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { priority: defaultPriority, status: "todo" },
   });
+
+  const titleValue = watch("title") ?? "";
+  const descriptionValue = watch("description") ?? "";
 
   useEffect(() => {
     fetch("/api/team/members")
@@ -119,9 +135,14 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
               placeholder={t.dashboard.enterTaskTitle}
               className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
             />
-            {errors.title && (
-              <p className="text-xs text-red-500 mt-1 ms-[10px]">{errors.title.message}</p>
-            )}
+            <div className="flex items-center justify-between mt-1 ms-[10px]">
+              {errors.title ? (
+                <p className="text-xs text-red-500">{errors.title.message}</p>
+              ) : <span />}
+              <p className={`text-xs ${titleValue.length > 100 ? "text-red-500" : "text-secondaryGray-600"}`}>
+                {titleValue.length}/100
+              </p>
+            </div>
           </div>
 
           {/* Description */}
@@ -135,6 +156,14 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
               rows={3}
               className="w-full rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white p-4 placeholder:text-secondaryGray-600 placeholder:font-normal resize-none"
             />
+            <div className="flex items-center justify-between mt-1 ms-[10px]">
+              {errors.description ? (
+                <p className="text-xs text-red-500">{errors.description.message}</p>
+              ) : <span />}
+              <p className={`text-xs ${descriptionValue.length > 500 ? "text-red-500" : "text-secondaryGray-600"}`}>
+                {descriptionValue.length}/500
+              </p>
+            </div>
           </div>
 
           {/* Row: Priority + Status */}
@@ -189,6 +218,9 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
                 type="date"
                 className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
               />
+              {errors.dueDate && (
+                <p className="text-xs text-red-500 mt-1 ms-[10px]">{errors.dueDate.message}</p>
+              )}
             </div>
           </div>
 

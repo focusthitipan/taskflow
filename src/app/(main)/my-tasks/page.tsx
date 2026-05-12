@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { LayoutGrid, List, CalendarDays } from "lucide-react";
+import { LayoutGrid, List, CalendarDays, Plus } from "lucide-react";
 import { SummaryWidgets } from "@/components/my-tasks/summary-widgets";
 import { ListView } from "@/components/my-tasks/list-view";
 import { CalendarView } from "@/components/my-tasks/calendar-view";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
+import { NewTaskModal } from "@/components/dashboard/new-task-modal";
 import { useT } from "@/components/layout/i18n-provider";
+import { canCreateTask } from "@/lib/can-edit";
 import type { Task, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -19,17 +21,23 @@ export default function MyTasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [view, setView] = useState<ViewMode>("kanban");
   const [loading, setLoading] = useState(true);
+  const [showNewTask, setShowNewTask] = useState(false);
 
   const userId = (session?.user as { id?: string })?.id;
   const userRole = (session?.user as { role?: UserRole })?.role;
 
-  useEffect(() => {
+  const fetchTasks = () => {
     if (!userId) return;
     fetch(`/api/tasks?assignee=${userId}`)
       .then((r) => r.json())
       .then((d) => setTasks(d.tasks))
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const views: { id: ViewMode; label: string; icon: React.ElementType }[] = [
@@ -44,8 +52,8 @@ export default function MyTasksPage() {
         <SummaryWidgets tasks={tasks} />
       </div>
 
-      {/* View toggle */}
-      <div className="stagger stagger-2 flex items-center gap-2 mb-6">
+      {/* View toggle + New Task */}
+      <div className="stagger stagger-2 flex items-center justify-between gap-2 mb-6">
         <div className="flex items-center gap-1 p-1 rounded-2xl bg-white dark:bg-navy-800 card-shadow">
           {views.map((v) => {
             const Icon = v.icon;
@@ -66,7 +74,23 @@ export default function MyTasksPage() {
             );
           })}
         </div>
+        {canCreateTask(userRole) && (
+          <button
+            onClick={() => setShowNewTask(true)}
+            className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand flex-shrink-0 transition-all duration-250 ease"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden 2sm:inline">{t.dashboard.newTask}</span>
+          </button>
+        )}
       </div>
+
+      {showNewTask && (
+        <NewTaskModal
+          onClose={() => setShowNewTask(false)}
+          onCreated={() => { setLoading(true); fetchTasks(); }}
+        />
+      )}
 
       {loading && (
         <div className="stagger stagger-3 flex items-center justify-center py-20">
