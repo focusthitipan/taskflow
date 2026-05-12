@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  password    String
+  role        UserRole @default(member)
+  status      UserStatus @default(active)
+  avatarColor String?
+  timezone    String?  @default("UTC+7")
+  language    String?  @default("en")
+  isOnline    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdTasks     Task[]         @relation("TaskCreator")
+  assignedTasks    TaskAssignee[]
+  comments         Comment[]
+  activityLogs     ActivityLog[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  admin
+  member
+  viewer
+}
+
+enum UserStatus {
+  active
+  inactive
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(todo)
+  priority    TaskPriority @default(medium)
+  project     String?
+  tags        String[]
+  dueDate     DateTime?
+  progress    Int          @default(0)
+  createdById String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  createdBy    User?          @relation("TaskCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  assignees    TaskAssignee[]
+  comments     Comment[]
+  activityLogs ActivityLog[]
+
+  @@map("tasks")
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  done
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+model TaskAssignee {
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@map("task_assignees")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String
+  targetType  String
+  targetId    String?
+  targetTitle String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task? @relation(fields: [targetId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
+
+model GraphData {
+  id           String   @id @default(cuid())
+  date         String
+  hour         String
+  productivity Int      @default(0)
+  energy       Int      @default(0)
+  focus        Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  @@unique([date, hour])
+  @@map("graph_data")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType @default(info)
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  info
+  success
+  warning
+  error
+}
+
+model WorkspaceSetting {
+  id                   String   @id @default(cuid())
+  name                 String   @default("TaskFlow Workspace")
+  logoUrl              String?
+  defaultPriority      TaskPriority @default(medium)
+  tags                 String[]
+  workingDays          String[]
+  businessHoursStart   String   @default("09:00")
+  businessHoursEnd     String   @default("18:00")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("workspace_settings")
+}
