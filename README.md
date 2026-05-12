@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="public/icon.svg" alt="TaskFlow Logo" width="100" />
-</p>
-
 <h1 align="center">TaskFlow</h1>
 
 <p align="center">
@@ -176,7 +172,15 @@ TaskFlow ใช้ระบบดีไซน์ **Glassmorphic Command Surface*
 
 ### ตัวแปรสภาพแวดล้อม
 
-สร้างไฟล์ `.env` ที่ root ของโปรเจกต์:
+> ⚠️ **สำคัญ:** ต้องสร้าง `.env` **ก่อน** รัน `npm install` เพราะ `postinstall` จะรัน `prisma generate` ซึ่งต้องการ `DATABASE_URL`
+
+สร้างไฟล์ `.env` ที่ root ของโปรเจกต์ (หรือคัดลอกจาก `.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+จากนั้นแก้ไขค่าภายในให้ตรงกับเครื่องของคุณ:
 
 ```bash
 # Database
@@ -194,11 +198,12 @@ NEXTAUTH_URL="http://localhost:3000"
 git clone https://github.com/your-username/taskflow.git
 cd taskflow
 
-# 2. ติดตั้ง dependencies
-npm install
+# 2. สร้างไฟล์ .env (สำคัญ: ต้องทำก่อน npm install)
+cp .env.example .env
+# จากนั้นแก้ไขค่า DATABASE_URL และ NEXTAUTH_SECRET ใน .env
 
-# 3. สร้าง Prisma client
-npm run db:generate
+# 3. ติดตั้ง dependencies
+npm install
 
 # 4. Push schema ลงฐานข้อมูล
 npm run db:push
