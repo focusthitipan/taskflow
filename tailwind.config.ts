@@ -59,13 +59,13 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        // Brand palette
+        // Brand palette (driven by CSS variables for dynamic accent color)
         brand: {
-          100: "#E9E3FF",
-          400: "#7551FF",
-          500: "#422AFB",
-          600: "#3311DB",
-          900: "#02044A",
+          100: "hsl(var(--brand-100))",
+          400: "hsl(var(--brand-400))",
+          500: "hsl(var(--brand-500))",
+          600: "hsl(var(--brand-600))",
+          900: "hsl(var(--brand-900))",
         },
         // Secondary gray (cool blue-gray)
         secondaryGray: {

@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import type { ActivityLog, WorkspaceSettings } from "@/types";
+import { useAccent, ACCENT_PALETTES } from "@/components/layout/accent-provider";
 
 type TabId = "profile" | "notifications" | "appearance" | "workspace" | "security";
 
@@ -27,15 +28,6 @@ const TABS: { id: TabId; label: string; icon: React.ElementType; adminOnly?: boo
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "workspace", label: "Workspace", icon: Building, adminOnly: true },
   { id: "security", label: "Security", icon: Shield, adminOnly: true },
-];
-
-const ACCENT_COLORS = [
-  { value: "#422AFB", label: "Brand Violet" },
-  { value: "#01B574", label: "Mint Green" },
-  { value: "#FFB547", label: "Amber" },
-  { value: "#EE5D50", label: "Coral" },
-  { value: "#3965FF", label: "Royal Blue" },
-  { value: "#7551FF", label: "Purple" },
 ];
 
 interface ProfileData {
@@ -375,7 +367,7 @@ function NotificationsTab() {
 
 function AppearanceTab() {
   const { theme, setTheme } = useTheme();
-  const [accent, setAccent] = useState("#422AFB");
+  const { accent, setAccent } = useAccent();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -443,21 +435,21 @@ function AppearanceTab() {
           Accent Color
         </h3>
         <div className="flex flex-wrap gap-3">
-          {ACCENT_COLORS.map((c) => (
+          {ACCENT_PALETTES.map((p) => (
             <button
-              key={c.value}
-              onClick={() => setAccent(c.value)}
-              title={c.label}
+              key={p.id}
+              onClick={() => setAccent(p.id)}
+              title={p.label}
               className={cn(
                 "w-10 h-10 rounded-full border-4 transition-all duration-150",
-                accent === c.value ? "border-secondaryGray-900 dark:border-white scale-110" : "border-transparent"
+                accent === p.id ? "border-secondaryGray-900 dark:border-white scale-110" : "border-transparent"
               )}
-              style={{ backgroundColor: c.value }}
+              style={{ backgroundColor: p.hex }}
             />
           ))}
         </div>
         <p className="text-xs text-secondaryGray-600 font-normal mt-2">
-          Selected: {ACCENT_COLORS.find((c) => c.value === accent)?.label}
+          Selected: {ACCENT_PALETTES.find((p) => p.id === accent)?.label}
         </p>
       </div>
     </div>
