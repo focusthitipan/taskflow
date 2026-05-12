@@ -1,9 +1,0 @@
-[     925ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ http://192.168.1.72:9000/api/navigation/global:0
-[     926ms] [ERROR] Response @ http://192.168.1.72:9000/js/echoes-DaE4R_0k.js:1
-[    1010ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ http://192.168.1.72:9000/api/features/list:0
-[    1011ms] [ERROR] Application failed to start Response @ http://192.168.1.72:9000/js/echoes-DaE4R_0k.js:1
-[    1012ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ http://192.168.1.72:9000/api/settings/values?keys=sonar.architecture.visualization.enabled:0
-[    1014ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ http://192.168.1.72:9000/api/users/current:0
-[    1163ms] Response
-[    1099ms] [ERROR] Unexpected status code: undefined @ http://192.168.1.72:9000/js/echoes-DaE4R_0k.js:1
-[    1871ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://192.168.1.72:9000/sessions/new?return_to=%2F:0

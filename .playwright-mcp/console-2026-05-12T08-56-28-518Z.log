@@ -1,4 +1,0 @@
-[   21201ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ http://192.168.1.72:9000/api/components/show?component=taskflow:0
-[   42716ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ http://192.168.1.72:9000/api/alm_settings/get_binding?project=taskflow:0
-[  297398ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ http://192.168.1.72:9000/api/alm_settings/get_binding?project=taskflow:0
-[  329056ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ http://192.168.1.72:9000/api/alm_settings/get_binding?project=taskflow:0
