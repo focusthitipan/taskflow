@@ -124,12 +124,18 @@ export function UsersTable({
                   >
                     <td className="px-3 sm:px-5 py-3 sm:py-4">
                       <div className="flex items-center gap-2 sm:gap-3">
-                        <div
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0"
-                          style={{ backgroundColor: user.avatarColor || "#422AFB" }}
-                        >
-                          {user.firstName[0]}
-                          {user.lastName[0]}
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={`${user.firstName}`} className="w-full h-full object-cover" />
+                          ) : (
+                            <div
+                              className="w-full h-full flex items-center justify-center text-white text-xs sm:text-sm font-bold"
+                              style={{ backgroundColor: user.avatarColor || "#EE5D50" }}
+                            >
+                              {user.firstName[0]}
+                              {user.lastName[0]}
+                            </div>
+                          )}
                         </div>
                         <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
                           {user.firstName} {user.lastName}

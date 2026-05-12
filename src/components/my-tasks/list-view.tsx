@@ -2,19 +2,24 @@
 
 import { useState } from "react";
 import { useT } from "@/components/layout/i18n-provider";
-import type { Task, TaskStatus, TaskPriority } from "@/types";
+import type { Task, TaskStatus, TaskPriority, UserRole } from "@/types";
 import { differenceInDays, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
+import { canEditTask } from "@/lib/can-edit";
 import { toast } from "sonner";
+import { TaskDetailModal } from "@/components/dashboard/task-detail-modal";
 
 interface ListViewProps {
   tasks: Task[];
   onTasksChange: (tasks: Task[]) => void;
+  currentUserRole?: UserRole;
+  currentUserId?: string;
 }
 
-export function ListView({ tasks, onTasksChange }: ListViewProps) {
+export function ListView({ tasks, onTasksChange, currentUserRole, currentUserId }: ListViewProps) {
   const { t } = useT();
   const [updating, setUpdating] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const PRIORITY_COLORS: Record<TaskPriority, string> = {
     urgent: "bg-red-100 text-red-500",
@@ -52,6 +57,11 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
     }
   };
 
+  const handleTaskUpdate = (updatedTask: Task) => {
+    onTasksChange(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    setSelectedTask(updatedTask);
+  };
+
   return (
     <div className="bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
       <table className="w-full">
@@ -87,7 +97,8 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
             return (
               <tr
                 key={task.id}
-                className="border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
+                onClick={() => setSelectedTask(task)}
+                className="border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150 cursor-pointer"
               >
                 <td className="px-5 py-4">
                   <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
@@ -124,9 +135,9 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
                 <td className="px-4 py-4">
                   <select
                     value={task.status}
-                    disabled={updating === task.id}
+                    disabled={updating === task.id || !canEditTask(currentUserRole, currentUserId, task)}
                     onChange={(e) => updateStatus(task.id, e.target.value as TaskStatus)}
-                    className="text-xs font-medium rounded-[10px] px-2 py-1 bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-900 dark:text-white border-none"
+                    className="text-xs font-medium rounded-[10px] px-2 py-1 bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-900 dark:text-white border-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="todo">{t.dashboard.toDo}</option>
                     <option value="in_progress">{t.dashboard.inProgress}</option>
@@ -169,6 +180,16 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
         <div className="py-12 text-center">
           <p className="text-sm text-secondaryGray-600 font-normal">{t.myTasks.noTasksFound}</p>
         </div>
+      )}
+
+      {selectedTask && (
+        <TaskDetailModal
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleTaskUpdate}
+          currentUserRole={currentUserRole}
+          currentUserId={currentUserId}
+        />
       )}
     </div>
   );

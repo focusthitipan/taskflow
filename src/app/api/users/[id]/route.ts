@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 import type { UserRole, UserStatus } from "@/types";
 
-function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarUrl: string | null; avatarColor: string | null; timezone: string | null; language: string | null; isOnline: boolean; createdAt: Date }) {
+function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarUrl: string | null; avatarColor: string | null; timezone: string | null; language: string | null; createdAt: Date }) {
   return {
     id: u.id,
     firstName: u.firstName,
@@ -14,12 +15,14 @@ function mapUser(u: { id: string; firstName: string; lastName: string; email: st
     avatarColor: u.avatarColor,
     timezone: u.timezone,
     language: u.language,
-    isOnline: u.isOnline,
     createdAt: u.createdAt.toISOString(),
   };
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   const { id } = await params;
   try {
     const user = await db.user.findUnique({ where: { id } });
@@ -31,6 +34,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   const { id } = await params;
   try {
     const body = await req.json();
@@ -53,6 +59,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   const { id } = await params;
   try {
     await db.user.delete({ where: { id } });

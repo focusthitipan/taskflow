@@ -10,11 +10,6 @@ import { Eye, EyeOff, Zap, ArrowRight, AlertCircle } from "lucide-react";
 import { useT } from "@/components/layout/i18n-provider";
 import { toast } from "sonner";
 
-const DEMO_ACCOUNTS = [
-  { email: "admin@taskflow.io", password: "admin123", role: "Admin", color: "#422AFB" },
-  { email: "sarah@taskflow.io", password: "member123", role: "Member", color: "#01B574" },
-];
-
 export default function LoginPage() {
   const { t } = useT();
   const router = useRouter();
@@ -31,7 +26,6 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -57,11 +51,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fillDemo = (email: string, password: string) => {
-    setValue("email", email);
-    setValue("password", password);
   };
 
   return (
@@ -162,37 +151,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo accounts */}
-          <div className="mt-6 pt-6 border-t border-secondaryGray-100 dark:border-white/10">
-            <p className="text-xs text-secondaryGray-600 text-center mb-3 font-normal">
-              {t.login.demoAccounts}
-            </p>
-            <div className="grid grid-cols-1 2sm:grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => fillDemo(acc.email, acc.password)}
-                  className="flex items-center gap-2 p-3 rounded-[10px] bg-brand-50 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150 text-left"
-                >
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                    style={{ backgroundColor: acc.color }}
-                  >
-                    {acc.role[0]}
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-secondaryGray-900 dark:text-white">
-                      {acc.role}
-                    </p>
-                    <p className="text-[10px] text-secondaryGray-600 font-normal truncate">
-                      {acc.email}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

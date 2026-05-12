@@ -12,7 +12,6 @@ export interface User {
   avatarColor?: string;
   timezone?: string;
   language?: string;
-  isOnline?: boolean;
   createdAt: string;
 }
 

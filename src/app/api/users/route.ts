@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 import type { UserRole, UserStatus } from "@/types";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarColor: string | null; timezone: string | null; language: string | null; isOnline: boolean; createdAt: Date }) {
+function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarColor: string | null; avatarUrl: string | null; timezone: string | null; language: string | null; createdAt: Date }) {
   return {
     id: u.id,
     firstName: u.firstName,
@@ -13,9 +14,9 @@ function mapUser(u: { id: string; firstName: string; lastName: string; email: st
     role: u.role as UserRole,
     status: u.status as UserStatus,
     avatarColor: u.avatarColor,
+    avatarUrl: u.avatarUrl,
     timezone: u.timezone,
     language: u.language,
-    isOnline: u.isOnline,
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -24,6 +25,9 @@ const VALID_SORT_BY = ["name", "email", "createdAt", "role"] as const;
 type SortBy = (typeof VALID_SORT_BY)[number];
 
 export async function GET(request: Request) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") || "";
   const role = searchParams.get("role") || "all";
@@ -88,6 +92,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const hashedPw = body.password ? await bcrypt.hash(body.password, 10) : await bcrypt.hash("changeme123", 10);
@@ -100,7 +107,7 @@ export async function POST(request: Request) {
         password: hashedPw,
         role: (body.role || "member") as UserRole,
         status: (body.status || "active") as UserStatus,
-        avatarColor: body.avatarColor || "#422AFB",
+        avatarColor: body.avatarColor || "#EE5D50",
         timezone: body.timezone || "UTC+7",
         language: "en",
       },

@@ -41,17 +41,15 @@ export default function TeamPage() {
     );
   }
 
-  const onlineCount = members.filter((m) => m.isOnline).length;
   const totalTasks = members.reduce((acc, m) => acc + m.taskCount, 0);
   const totalCompleted = members.reduce((acc, m) => acc + m.completedTaskCount, 0);
 
   return (
     <div className="space-y-6">
       {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="stagger stagger-1 grid grid-cols-2 gap-3 sm:gap-4">
         {[
           { label: t.team.teamMembers, value: members.length, color: "text-brand-500" },
-          { label: t.team.onlineNow, value: onlineCount, color: "text-green-500" },
           { label: t.team.totalTasks, value: totalTasks, color: "text-secondaryGray-900 dark:text-white" },
         ].map((stat) => (
           <div
@@ -67,7 +65,7 @@ export default function TeamPage() {
       </div>
 
       {/* Member cards */}
-      <div>
+      <div className="stagger stagger-2">
         <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-4">
           {t.team.teamMembers}
         </h2>
@@ -79,13 +77,13 @@ export default function TeamPage() {
       </div>
 
       {/* Workload + Activity */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+      <div className="stagger stagger-3 grid grid-cols-1 xl:grid-cols-2 gap-5">
         <WorkloadOverview members={members} />
         <ActivityFeed activity={activity} />
       </div>
 
       {/* Team Performance Chart */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
+      <div className="stagger stagger-4 bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
         <h3 className="text-lg sm:text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
           {t.team.taskDistribution}
         </h3>

@@ -66,7 +66,7 @@ export default function GraphPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       {data.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="stagger stagger-1 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
               label: t.graph.avgProductivity,
@@ -98,7 +98,7 @@ export default function GraphPage() {
       )}
 
       {/* Chart card */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
+      <div className="stagger stagger-2 bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
@@ -118,6 +118,8 @@ export default function GraphPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
+                min={format(new Date(new Date().setFullYear(new Date().getFullYear() - 1)), "yyyy-MM-dd")}
+                max={format(new Date(), "yyyy-MM-dd")}
                 className="bg-transparent text-sm font-medium text-secondaryGray-900 dark:text-white"
               />
             </div>
@@ -183,6 +185,18 @@ export default function GraphPage() {
             <div className="h-[420px] flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
             </div>
+          ) : filteredData.length === 0 ? (
+            <div className="h-[420px] flex flex-col items-center justify-center text-center px-5">
+              <div className="w-12 h-12 rounded-full bg-secondaryGray-300 dark:bg-navy-700 flex items-center justify-center mb-4">
+                <CalendarDays className="w-6 h-6 text-secondaryGray-500" />
+              </div>
+              <p className="text-sm font-bold text-secondaryGray-900 dark:text-white mb-1">
+                No activity data
+              </p>
+              <p className="text-xs text-secondaryGray-600 font-normal max-w-[280px]">
+                No tasks, comments, or activity were recorded on this date. Try selecting a different day.
+              </p>
+            </div>
           ) : (
             <DailyChart data={filteredData} id="daily-chart" />
           )}
@@ -190,8 +204,8 @@ export default function GraphPage() {
       </div>
 
       {/* Data table */}
-      {!loading && data.length > 0 && (
-        <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto custom-scrollbar">
+      {!loading && filteredData.length > 0 && (
+        <div className="stagger stagger-3 bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto custom-scrollbar">
           <h3 className="text-base sm:text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
             {t.graph.hourlyData}
           </h3>

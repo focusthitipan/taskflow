@@ -1,6 +1,12 @@
 export type Locale = "en" | "th";
 
 export interface Translations {
+  // 404
+  notFound: {
+    title: string;
+    description: string;
+    backHome: string;
+  };
   // Common
   common: {
     save: string;
@@ -78,6 +84,8 @@ export interface Translations {
     unassigned: string;
     daysLeft: string;
     daysOverdue: string;
+    workDaysLeft: string;
+    workDaysOverdue: string;
     noDescription: string;
     comments: string;
     addComment: string;
@@ -245,6 +253,7 @@ export interface Translations {
     commentMentionDesc: string;
     teamActivity: string;
     teamActivityDesc: string;
+    underDevelopment: string;
     failedSavePreferences: string;
     colorMode: string;
     light: string;
@@ -264,6 +273,13 @@ export interface Translations {
     auditLog: string;
     noAuditLogs: string;
     when: string;
+  };
+  // Global Search
+  search: {
+    placeholder: string;
+    noResults: string;
+    searchingFor: string;
+    hint: string;
   };
   // Login
   login: {

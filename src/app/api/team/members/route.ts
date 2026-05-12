@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const users = await db.user.findMany({
       include: {
@@ -30,7 +34,6 @@ export async function GET() {
         avatarColor: u.avatarColor,
         timezone: u.timezone,
         language: u.language,
-        isOnline: u.isOnline,
         createdAt: u.createdAt.toISOString(),
         taskCount,
         completedTaskCount,

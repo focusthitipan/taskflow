@@ -1,25 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Edit2, Save, Calendar, Tag, User, AlertCircle, MessageSquare } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import type { Task, TaskPriority, TaskStatus } from "@/types";
+import type { Task, TaskPriority, TaskStatus, UserRole } from "@/types";
 import { useT } from "@/components/layout/i18n-provider";
 import { cn } from "@/lib/utils";
+import { canEditTask, canCreateTask } from "@/lib/can-edit";
 import { toast } from "sonner";
+
+interface MentionUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string | null;
+  avatarColor?: string | null;
+}
 
 interface TaskDetailModalProps {
   task: Task;
   onClose: () => void;
   onUpdate: (task: Task) => void;
+  currentUserRole?: UserRole;
+  currentUserId?: string;
 }
 
-export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProps) {
+export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, currentUserId }: TaskDetailModalProps) {
+  const canEdit = canEditTask(currentUserRole, currentUserId, task);
+  const canComment = canCreateTask(currentUserRole);
   const { t, locale } = useT();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ ...task });
   const [newComment, setNewComment] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Mention autocomplete
+  const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([]);
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const mentionInputRef = useRef<HTMLInputElement>(null);
 
   const PRIORITY_COLORS: Record<TaskPriority, string> = {
     urgent: "bg-red-100 text-red-500",
@@ -71,6 +91,68 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
       }
     } catch {
       toast.error(t.dashboard.failedAddComment);
+    }
+  };
+
+  // Fetch team members for mention autocomplete
+  useEffect(() => {
+    fetch("/api/team/members")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.members) setMentionUsers(d.members);
+      })
+      .catch(() => {});
+  }, []);
+
+  const getMentionCandidates = useCallback((query: string) => {
+    if (!query) return mentionUsers.slice(0, 6);
+    const q = query.toLowerCase();
+    return mentionUsers
+      .filter(
+        (u) =>
+          u.firstName.toLowerCase().includes(q) ||
+          u.lastName.toLowerCase().includes(q)
+      )
+      .slice(0, 6);
+  }, [mentionUsers]);
+
+  const handleCommentChange = (value: string) => {
+    setNewComment(value);
+    const atMatch = value.match(/@(\S*)$/);
+    if (atMatch) {
+      setMentionQuery(atMatch[1]);
+      setMentionOpen(true);
+      setMentionIndex(0);
+    } else {
+      setMentionOpen(false);
+      setMentionQuery("");
+    }
+  };
+
+  const selectMention = (user: MentionUser) => {
+    const replaced = newComment.replace(/@\S*$/, `@${user.firstName} `);
+    setNewComment(replaced);
+    setMentionOpen(false);
+    setMentionQuery("");
+    mentionInputRef.current?.focus();
+  };
+
+  const handleMentionKeyDown = (e: React.KeyboardEvent) => {
+    if (!mentionOpen) return;
+    const candidates = getMentionCandidates(mentionQuery);
+    if (candidates.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setMentionIndex((i) => (i + 1) % candidates.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setMentionIndex((i) => (i - 1 + candidates.length) % candidates.length);
+    } else if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      selectMention(candidates[mentionIndex]);
+    } else if (e.key === "Escape") {
+      setMentionOpen(false);
     }
   };
 
@@ -139,7 +221,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 <Save className="w-3.5 h-3.5" />
                 {saving ? t.common.saving : t.common.save}
               </button>
-            ) : (
+            ) : canEdit ? (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-brand-500 border border-brand-500/30 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
@@ -147,7 +229,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 <Edit2 className="w-3.5 h-3.5" />
                 {t.common.edit}
               </button>
-            )}
+            ) : null}
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
@@ -338,12 +420,18 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                   key={user.id}
                   className="flex items-center gap-2 px-3 py-2 rounded-full bg-secondaryGray-300 dark:bg-navy-700"
                 >
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                    style={{ backgroundColor: user.avatarColor || "#422AFB" }}
-                  >
-                    {user.firstName[0]}
-                    {user.lastName[0]}
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={`${user.firstName}`} className="w-full h-full object-cover" />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                        style={{ backgroundColor: user.avatarColor || "#EE5D50" }}
+                      >
+                        {user.firstName[0]}
+                        {user.lastName[0]}
+                      </div>
+                    )}
                   </div>
                   <span className="text-xs font-medium text-secondaryGray-900 dark:text-white">
                     {user.firstName} {user.lastName}
@@ -364,12 +452,18 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
             <div className="space-y-3 mb-4">
               {(form.comments || []).map((comment) => (
                 <div key={comment.id} className="flex gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                    style={{ backgroundColor: comment.user?.avatarColor || "#422AFB" }}
-                  >
-                    {comment.user?.firstName?.[0]}
-                    {comment.user?.lastName?.[0]}
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {comment.user?.avatarUrl ? (
+                      <img src={comment.user.avatarUrl} alt={comment.user.firstName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                        style={{ backgroundColor: comment.user?.avatarColor || "#EE5D50" }}
+                      >
+                        {comment.user?.firstName?.[0]}
+                        {comment.user?.lastName?.[0]}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -387,14 +481,59 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 </div>
               ))}
             </div>
+            {canComment && (
             <div className="flex gap-3">
-              <input
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addComment()}
-                placeholder={t.dashboard.addComment}
-                className="flex-1 h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
-              />
+              <div className="flex-1 relative">
+                <input
+                  ref={mentionInputRef}
+                  value={newComment}
+                  onChange={(e) => handleCommentChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (mentionOpen) {
+                      handleMentionKeyDown(e);
+                    } else if (e.key === "Enter") {
+                      e.preventDefault();
+                      addComment();
+                    }
+                  }}
+                  placeholder={t.dashboard.addComment}
+                  className="w-full h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
+                />
+                {mentionOpen && getMentionCandidates(mentionQuery).length > 0 && (
+                  <div className="absolute bottom-full left-0 right-0 mb-1 bg-white dark:bg-navy-800 rounded-[16px] card-shadow border border-secondaryGray-100 dark:border-white/10 overflow-hidden z-50">
+                    {getMentionCandidates(mentionQuery).map((user, idx) => (
+                      <button
+                        key={user.id}
+                        onClick={() => selectMention(user)}
+                        onMouseEnter={() => setMentionIndex(idx)}
+                        className={cn(
+                          "flex items-center gap-2 w-full px-3 py-2 text-left transition-colors duration-150",
+                          idx === mentionIndex
+                            ? "bg-brand-100 dark:bg-brand-900/30"
+                            : "hover:bg-secondaryGray-300 dark:hover:bg-navy-700"
+                        )}
+                      >
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.firstName} className="w-full h-full object-cover" />
+                          ) : (
+                            <div
+                              className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                              style={{ backgroundColor: user.avatarColor || "#EE5D50" }}
+                            >
+                              {user.firstName[0]}
+                              {user.lastName[0]}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-secondaryGray-900 dark:text-white">
+                          {user.firstName} {user.lastName}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 onClick={addComment}
                 className="px-4 h-10 rounded-full text-sm font-bold text-white gradient-brand"
@@ -402,6 +541,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 {t.common.post}
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>

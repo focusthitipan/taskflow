@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { useT } from "@/components/layout/i18n-provider";
+import { useWorkspace } from "@/components/layout/workspace-context";
 import type { Task, User } from "@/types";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ interface NewTaskModalProps {
 export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
   const { t } = useT();
   const { data: session } = useSession();
+  const { defaultPriority } = useWorkspace();
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -39,7 +41,7 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { priority: "medium", status: "todo" },
+    defaultValues: { priority: defaultPriority, status: "todo" },
   });
 
   useEffect(() => {
@@ -204,11 +206,17 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
                         : "bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-900 dark:text-white"
                     }`}
                   >
-                    <div
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
-                      style={{ backgroundColor: user.avatarColor || "#422AFB" }}
-                    >
-                      {user.firstName[0]}
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center overflow-hidden">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={`${user.firstName}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div
+                          className="w-full h-full flex items-center justify-center text-white text-[9px] font-bold"
+                          style={{ backgroundColor: user.avatarColor || "#EE5D50" }}
+                        >
+                          {user.firstName[0]}
+                        </div>
+                      )}
                     </div>
                     {user.firstName} {user.lastName}
                   </button>

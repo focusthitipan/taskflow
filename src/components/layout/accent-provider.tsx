@@ -131,7 +131,7 @@ export function AccentProvider({ children }: { children: React.ReactNode }) {
   const [accent, setAccentState] = useState<AccentId>("coral");
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount (before apply)
+  // Hydrate from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
+export async function GET(_request: Request) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const notifications = await db.notification.findMany({
-      where: userId ? { userId } : undefined,
+      where: { userId: auth.userId },
       orderBy: { createdAt: "desc" },
       take: 20,
     });
@@ -30,15 +31,23 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
 
     if (body.readAll) {
       await db.notification.updateMany({
-        where: body.userId ? { userId: body.userId } : {},
+        where: { userId: auth.userId },
         data: { read: true },
       });
     } else if (body.id) {
+      // Verify the notification belongs to the user
+      const notif = await db.notification.findUnique({ where: { id: body.id } });
+      if (!notif || notif.userId !== auth.userId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
       await db.notification.update({
         where: { id: body.id },
         data: { read: true },
@@ -46,6 +55,7 @@ export async function PATCH(request: Request) {
     }
 
     const notifications = await db.notification.findMany({
+      where: { userId: auth.userId },
       orderBy: { createdAt: "desc" },
       take: 20,
     });

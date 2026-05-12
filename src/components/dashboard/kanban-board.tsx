@@ -15,10 +15,11 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Task, TaskStatus } from "@/types";
+import type { Task, TaskStatus, UserRole } from "@/types";
 import { TaskCard } from "./task-card";
 import { TaskDetailModal } from "./task-detail-modal";
 import { useT } from "@/components/layout/i18n-provider";
+import { canEditTask } from "@/lib/can-edit";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +32,8 @@ function SortableTaskCard({ task, onClick }: { task: Task; onClick: () => void }
   return (
     <div
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      // Use Translate (not Transform) to avoid unwanted scale from dnd-kit
+      style={{ transform: CSS.Translate.toString(transform), transition }}
       {...attributes}
       {...listeners}
       className={cn(isDragging && "opacity-30")}
@@ -47,12 +49,16 @@ function DroppableColumn({
   onTaskClick,
   isOver,
   dropText,
+  currentUserRole,
+  currentUserId,
 }: {
   column: { id: TaskStatus; label: string; dotColor: string };
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   isOver: boolean;
   dropText: string;
+  currentUserRole?: UserRole;
+  currentUserId?: string;
 }) {
   const { setNodeRef } = useDroppable({ id: column.id });
 
@@ -80,9 +86,13 @@ function DroppableColumn({
       <div ref={setNodeRef} className="flex-1 min-h-[120px]">
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-3">
-            {tasks.map((task) => (
-              <SortableTaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
-            ))}
+            {tasks.map((task) =>
+              canEditTask(currentUserRole, currentUserId, task) ? (
+                <SortableTaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
+              ) : (
+                <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
+              )
+            )}
           </div>
         </SortableContext>
 
@@ -99,9 +109,11 @@ function DroppableColumn({
 interface KanbanBoardProps {
   tasks: Task[];
   onTasksChange: (tasks: Task[]) => void;
+  currentUserRole?: UserRole;
+  currentUserId?: string;
 }
 
-export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
+export function KanbanBoard({ tasks, onTasksChange, currentUserRole, currentUserId }: KanbanBoardProps) {
   const { t } = useT();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -121,7 +133,11 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
 
   const handleDragStart = (event: DragStartEvent) => {
     const task = tasks.find((t) => t.id === event.active.id);
-    setActiveTask(task || null);
+    if (!task || !canEditTask(currentUserRole, currentUserId, task)) {
+      setActiveTask(null);
+      return;
+    }
+    setActiveTask(task);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -144,7 +160,7 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
 
     const taskId = active.id as string;
     const task = tasks.find((t) => t.id === taskId);
-    if (!task) return;
+    if (!task || !canEditTask(currentUserRole, currentUserId, task)) return;
 
     const targetColId = COLUMNS.find((c) => c.id === over.id)?.id;
     const overTaskColId = tasks.find((t) => t.id === over.id)?.status;
@@ -184,21 +200,23 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-5 overflow-x-auto lg:overflow-x-visible custom-scrollbar snap-x snap-mandatory lg:snap-none -mx-3 sm:mx-0 px-3 sm:px-0">
+        {/* Grid layout — no overflow-x-auto/snap to avoid pointer offset bugs during drag */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {COLUMNS.map((column) => (
-            <div key={column.id} className="min-w-[85vw] sm:min-w-[320px] lg:min-w-0 snap-center lg:snap-align-none">
-              <DroppableColumn
-                column={column}
-                tasks={tasksByColumn(column.id)}
-                onTaskClick={setSelectedTask}
-                isOver={overColumn === column.id}
-                dropText={t.dashboard.dropTasksHere}
-              />
-            </div>
+            <DroppableColumn
+              key={column.id}
+              column={column}
+              tasks={tasksByColumn(column.id)}
+              onTaskClick={setSelectedTask}
+              isOver={overColumn === column.id}
+              dropText={t.dashboard.dropTasksHere}
+              currentUserRole={currentUserRole}
+              currentUserId={currentUserId}
+            />
           ))}
         </div>
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeTask && (
             <div className="opacity-90 rotate-2 scale-105">
               <TaskCard task={activeTask} onClick={() => {}} />
@@ -212,6 +230,8 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
+          currentUserRole={currentUserRole}
+          currentUserId={currentUserId}
         />
       )}
     </>

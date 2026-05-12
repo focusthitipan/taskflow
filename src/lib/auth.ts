@@ -1,4 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "./db";
@@ -68,3 +70,34 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "taskflow-dev-secret-key-2024",
 };
+
+// ── Auth helpers for API routes ──
+
+interface AuthResult {
+  userId: string;
+  role: string;
+}
+
+/** Require authenticated user — returns 401 if no session */
+export async function requireAuth(): Promise<AuthResult | NextResponse> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userId = (session.user as { id?: string }).id;
+  const role = (session.user as { role?: string }).role || "member";
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return { userId, role };
+}
+
+/** Require admin role — returns 401 if no session, 403 if not admin */
+export async function requireAdmin(): Promise<AuthResult | NextResponse> {
+  const result = await requireAuth();
+  if (result instanceof NextResponse) return result;
+  if (result.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return result;
+}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { notifyUsers, notifyOne } from "@/lib/notify";
 
 export async function GET(
   _req: Request,
@@ -53,12 +54,19 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
     const userId = (session.user as { id?: string }).id;
+    const role = (session.user as { role?: string }).role;
 
     if (!userId) {
       return NextResponse.json({ error: "User ID not found" }, { status: 400 });
     }
+
+    // Viewer cannot comment
+    if (role === "viewer") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const body = await req.json();
 
     const comment = await db.comment.create({
       data: {
@@ -70,16 +78,60 @@ export async function POST(
     });
 
     // Also log activity
-    const task = await db.task.findUnique({ where: { id } });
-    await db.activityLog.create({
-      data: {
-        userId,
-        action: "commented on",
-        targetType: "task",
-        targetId: id,
-        targetTitle: task?.title || "Unknown task",
-      },
+    const task = await db.task.findUnique({
+      where: { id },
+      include: { assignees: { include: { user: true } } },
     });
+
+    if (task) {
+      await db.activityLog.create({
+        data: {
+          userId,
+          action: "commented on",
+          targetType: "task",
+          targetId: id,
+          targetTitle: task.title,
+        },
+      });
+
+      // 🔔 Notify assignees (skip commenter)
+      const otherAssigneeIds = task.assignees
+        .map((a) => a.user.id)
+        .filter((uid) => uid !== userId);
+
+      if (otherAssigneeIds.length > 0) {
+        notifyUsers(otherAssigneeIds, "notifCommentMention", {
+          title: "New Comment",
+          message: `New comment on "${task.title}"`,
+          type: "info",
+        });
+      }
+
+      // 🔔 Check for @mentions in comment content
+      const mentionPattern = /@(\S+)/g;
+      const mentionedNames = [...new Set([...body.content.matchAll(mentionPattern)].map((m: RegExpMatchArray) => m[1]))];
+
+      if (mentionedNames.length > 0) {
+        const mentionedUsers = await db.user.findMany({
+          where: {
+            OR: mentionedNames.map((name) => ({
+              firstName: { contains: name, mode: "insensitive" as const },
+            })),
+          },
+          select: { id: true, firstName: true },
+        });
+
+        for (const mu of mentionedUsers) {
+          if (mu.id !== userId) {
+            notifyOne(mu.id, {
+              title: "You Were Mentioned",
+              message: `You were mentioned in a comment on "${task.title}"`,
+              type: "info",
+            }, "notifCommentMention");
+          }
+        }
+      }
+    }
 
     return NextResponse.json(
       {

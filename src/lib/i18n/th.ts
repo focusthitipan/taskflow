@@ -1,6 +1,11 @@
 import { Translations } from "./types";
 
 const th: Translations = {
+  notFound: {
+    title: "ไม่พบหน้านี้",
+    description: "หน้าที่คุณกำลังค้นหาไม่มีอยู่ หรือถูกย้ายไปแล้ว",
+    backHome: "กลับไปยังแดชบอร์ด",
+  },
   common: {
     save: "บันทึก",
     cancel: "ยกเลิก",
@@ -74,6 +79,8 @@ const th: Translations = {
     unassigned: "ยังไม่ได้มอบหมาย",
     daysLeft: "วันคงเหลือ",
     daysOverdue: "วันเกินกำหนด",
+    workDaysLeft: "วันทำงานคงเหลือ",
+    workDaysOverdue: "วันทำงานเกินกำหนด",
     noDescription: "ไม่มีคำอธิบาย",
     comments: "ความคิดเห็น",
     addComment: "เพิ่มความคิดเห็น...",
@@ -236,6 +243,7 @@ const th: Translations = {
     commentMentionDesc: "เมื่อมีคนกล่าวถึงคุณ",
     teamActivity: "กิจกรรมทีม",
     teamActivityDesc: "อีเมลสรุปทีมรายสัปดาห์",
+    underDevelopment: "อยู่ระหว่างการพัฒนา",
     failedSavePreferences: "ไม่สามารถบันทึกการตั้งค่า",
     colorMode: "โหมดสี",
     light: "สว่าง",
@@ -255,6 +263,12 @@ const th: Translations = {
     auditLog: "บันทึกการตรวจสอบ",
     noAuditLogs: "ไม่พบบันทึกการตรวจสอบ",
     when: "เมื่อ",
+  },
+  search: {
+    placeholder: "ค้นหาจากชื่องาน, ความสำคัญ, หรือสถานะ...",
+    noResults: "ไม่พบงาน",
+    searchingFor: "งาน",
+    hint: "ลองพิมพ์ชื่องาน, ความสำคัญ (ด่วน, สูง, ปานกลาง, ต่ำ), หรือสถานะ (ต้องทำ, กำลังดำเนินการ, เสร็จแล้ว)",
   },
   login: {
     welcomeBack: "ยินดีต้อนรับกลับ",

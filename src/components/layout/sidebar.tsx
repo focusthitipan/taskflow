@@ -17,12 +17,14 @@ import {
 import { useSidebar } from "./sidebar-context";
 import { useT } from "./i18n-provider";
 import { cn } from "@/lib/utils";
+import { useWorkspace } from "./workspace-context";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { collapsed, toggle, mobileOpen, setMobileOpen, isMobile } = useSidebar();
   const { t } = useT();
+  const { name: workspaceName } = useWorkspace();
   const isAdmin = (session?.user as { role?: string })?.role === "admin";
 
   const NAV_ITEMS = [
@@ -81,7 +83,7 @@ export function Sidebar() {
         )}
         {/* Active indicator bar */}
         {active && (
-          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-9 rounded-[5px] bg-brand-500 dark:bg-brand-400" />
+          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-9 rounded-[5px] bg-brand-500 dark:bg-brand-400 animate-[indicator-pop_200ms_ease_both]" />
         )}
       </Link>
     );
@@ -96,7 +98,7 @@ export function Sidebar() {
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 pt-8 pb-6 flex-shrink-0">
+      <div className="logo-enter flex items-center gap-3 px-5 pt-8 pb-6 flex-shrink-0">
         <div
           className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 gradient-brand"
         >
@@ -104,26 +106,30 @@ export function Sidebar() {
         </div>
         {(!collapsed || isMobile) && (
           <span className="text-xl font-bold text-secondaryGray-900 dark:text-white">
-            TaskFlow
+            {workspaceName}
           </span>
         )}
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-        {NAV_ITEMS.map((item) => (
-          <NavItem key={item.href} {...item} />
+        {NAV_ITEMS.map((item, i) => (
+          <div key={item.href} className={cn("nav-item", `nav-item-${i + 1}`)}>
+            <NavItem {...item} />
+          </div>
         ))}
 
         {isAdmin && (
           <>
             {(!collapsed || isMobile) && (
-              <p className="text-[10px] font-bold text-secondaryGray-600 uppercase tracking-wider px-4 pt-4 pb-1">
+              <p className="nav-item nav-item-5 text-[10px] font-bold text-secondaryGray-600 uppercase tracking-wider px-4 pt-4 pb-1">
                 {t.nav.admin}
               </p>
             )}
-            {ADMIN_ITEMS.map((item) => (
-              <NavItem key={item.href} {...item} />
+            {ADMIN_ITEMS.map((item, i) => (
+              <div key={item.href} className={cn("nav-item", `nav-item-${NAV_ITEMS.length + i + 2}`)}>
+                <NavItem {...item} />
+              </div>
             ))}
           </>
         )}
@@ -131,8 +137,10 @@ export function Sidebar() {
 
       {/* Bottom items */}
       <div className="px-3 pb-4 space-y-1 flex-shrink-0">
-        {BOTTOM_ITEMS.map((item) => (
-          <NavItem key={item.href} {...item} />
+        {BOTTOM_ITEMS.map((item, i) => (
+          <div key={item.href} className={cn("nav-item", `nav-item-${NAV_ITEMS.length + ADMIN_ITEMS.length + i + 2}`)}>
+            <NavItem {...item} />
+          </div>
         ))}
 
         {/* Collapse toggle — desktop only */}

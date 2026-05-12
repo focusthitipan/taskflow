@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { db } from "@/lib/db";
+import { authOptions } from "@/lib/auth";
+import { notifyUsers } from "@/lib/notify";
 import type { TaskStatus, TaskPriority } from "@/types";
 
 function mapTask(t: {
@@ -195,6 +198,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const role = (session.user as { role?: string }).role;
+
+    // Viewer cannot create tasks
+    if (role === "viewer") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await request.json();
 
     const task = await db.task.create({
@@ -214,6 +229,16 @@ export async function POST(request: Request) {
       },
       include: includeShape,
     });
+
+    // 🔔 Notify assignees (skip creator)
+    const assigneeIds = (body.assignees || []).map((a: { id: string }) => a.id).filter((id: string) => id !== body.createdBy);
+    if (assigneeIds.length > 0) {
+      notifyUsers(assigneeIds, "notifTaskAssigned", {
+        title: "New Task Assigned",
+        message: `You've been assigned to "${body.title}"`,
+        type: "info",
+      });
+    }
 
     return NextResponse.json({ task: mapTask(task as Parameters<typeof mapTask>[0]) }, { status: 201 });
   } catch (error) {

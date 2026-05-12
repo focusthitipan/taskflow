@@ -1,10 +1,12 @@
 "use client";
 
 import { Calendar, MessageSquare } from "lucide-react";
-import { differenceInDays, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import type { Task } from "@/types";
 import { useT } from "@/components/layout/i18n-provider";
-import { cn } from "@/lib/utils";
+import { useWorkspace } from "@/components/layout/workspace-context";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { cn, remainingWorkDays } from "@/lib/utils";
 
 interface TaskCardProps {
   task: Task;
@@ -14,7 +16,8 @@ interface TaskCardProps {
 
 function DueDateBadge({ dueDate }: { dueDate: string }) {
   const { t } = useT();
-  const days = differenceInDays(parseISO(dueDate), new Date());
+  const { workingDays } = useWorkspace();
+  const days = remainingWorkDays(parseISO(dueDate), workingDays);
   const isOverdue = days < 0;
   const isUrgent = days >= 0 && days <= 2;
 
@@ -31,10 +34,10 @@ function DueDateBadge({ dueDate }: { dueDate: string }) {
     >
       <Calendar className="w-3 h-3" />
       {isOverdue
-        ? `${Math.abs(days)}${t.dashboard.daysOverdue}`
+        ? `${Math.abs(days)}${t.dashboard.workDaysOverdue}`
         : days === 0
           ? t.common.today
-          : `${days}${t.dashboard.daysLeft}`}
+          : `${days}${t.dashboard.workDaysLeft}`}
     </span>
   );
 }
@@ -122,15 +125,20 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
         {/* Assignee avatars */}
         <div className="flex items-center">
           {visibleAssignees.map((user, i) => (
-            <div
+            <Avatar
               key={user.id}
-              className="w-7 h-7 rounded-full border-2 border-white dark:border-navy-800 flex items-center justify-center text-white text-xs font-bold -ml-1 first:ml-0"
-              style={{ backgroundColor: user.avatarColor || "#422AFB" }}
+              className="w-7 h-7 rounded-full border-2 border-white dark:border-navy-800 -ml-1 first:ml-0"
               title={`${user.firstName} ${user.lastName}`}
             >
-              {user.firstName[0]}
-              {user.lastName[0]}
-            </div>
+              {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} />}
+              <AvatarFallback
+                className="text-white text-xs font-bold"
+                style={{ backgroundColor: user.avatarColor || "#EE5D50" }}
+              >
+                {user.firstName[0]}
+                {user.lastName[0]}
+              </AvatarFallback>
+            </Avatar>
           ))}
           {extraCount > 0 && (
             <div className="w-7 h-7 rounded-full border-2 border-white dark:border-navy-800 bg-secondaryGray-600 flex items-center justify-center text-white text-xs font-bold -ml-1">

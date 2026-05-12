@@ -25,12 +25,18 @@ export function WorkloadOverview({ members }: WorkloadOverviewProps) {
             <div key={member.id}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                    style={{ backgroundColor: member.avatarColor || "#422AFB" }}
-                  >
-                    {member.firstName[0]}
-                    {member.lastName[0]}
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden">
+                    {member.avatarUrl ? (
+                      <img src={member.avatarUrl} alt={`${member.firstName}`} className="w-full h-full object-cover" />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                        style={{ backgroundColor: member.avatarColor || "#EE5D50" }}
+                      >
+                        {member.firstName[0]}
+                        {member.lastName[0]}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm font-bold text-secondaryGray-900 dark:text-white leading-none">

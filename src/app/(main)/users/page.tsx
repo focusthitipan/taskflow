@@ -101,7 +101,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="stagger stagger-1 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
           { label: t.users.totalUsers, value: pagination.total, color: "text-brand-500" },
           { label: t.users.active, value: activeCount, color: "text-green-500" },
@@ -120,7 +120,7 @@ export default function UsersPage() {
       </div>
 
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="stagger stagger-2 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white">{t.users.allUsers}</h2>
         <button
           onClick={() => setAddOpen(true)}
@@ -132,7 +132,7 @@ export default function UsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      <div className="stagger stagger-3 flex flex-wrap gap-3">
         <div className="flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-800 flex-1 min-w-[200px]">
           <Search className="w-4 h-4 text-secondaryGray-600 flex-shrink-0" />
           <input
@@ -166,6 +166,7 @@ export default function UsersPage() {
       </div>
 
       {/* Table */}
+      <div className="stagger stagger-4">
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
@@ -183,6 +184,7 @@ export default function UsersPage() {
         />
       )}
 
+      </div>
       {/* Modals */}
       {addOpen && (
         <UserModal mode="add" onClose={() => setAddOpen(false)} onSaved={handleUserSaved} />

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
@@ -15,7 +16,6 @@ async function main() {
   await prisma.comment.deleteMany();
   await prisma.taskAssignee.deleteMany();
   await prisma.notification.deleteMany();
-  await prisma.graphData.deleteMany();
   await prisma.task.deleteMany();
   await prisma.workspaceSetting.deleteMany();
   await prisma.user.deleteMany();
@@ -36,10 +36,9 @@ async function main() {
       password: adminPw,
       role: "admin",
       status: "active",
-      avatarColor: "#422AFB",
+      avatarColor: "#EE5D50",
       timezone: "UTC+7",
       language: "en",
-      isOnline: true,
     },
   });
 
@@ -54,7 +53,6 @@ async function main() {
       avatarColor: "#01B574",
       timezone: "UTC+8",
       language: "en",
-      isOnline: true,
     },
   });
 
@@ -69,7 +67,6 @@ async function main() {
       avatarColor: "#FFB547",
       timezone: "UTC-5",
       language: "en",
-      isOnline: false,
     },
   });
 
@@ -84,7 +81,6 @@ async function main() {
       avatarColor: "#EE5D50",
       timezone: "UTC+5:30",
       language: "en",
-      isOnline: true,
     },
   });
 
@@ -99,7 +95,6 @@ async function main() {
       avatarColor: "#3965FF",
       timezone: "UTC+0",
       language: "en",
-      isOnline: false,
     },
   });
 
@@ -373,49 +368,10 @@ async function main() {
 
   console.log("🔔 Created notifications");
 
-  // Create graph data for today and yesterday
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-
-  const graphRows: Array<{ date: string; hour: string; productivity: number; energy: number; focus: number }> = [];
-  
-  for (const date of [today, yesterday]) {
-    const seed = new Date(date).getDate();
-    for (let h = 1; h <= 24; h++) {
-      const hour = `${String(h).padStart(2, "0")}:00`;
-      const noise = (Math.sin(h * seed * 0.3) + Math.cos(h * 0.7)) * 10;
-
-      const productivity = h < 7
-        ? Math.max(0, 10 + noise)
-        : h < 12 ? Math.min(100, 60 + (h - 7) * 10 + noise)
-        : h < 14 ? Math.max(30, 80 - noise)
-        : h < 18 ? Math.min(100, 75 + noise)
-        : Math.max(0, 40 - (h - 18) * 8 + noise);
-
-      const energy = h < 8 ? -50 + h * 5 + noise
-        : h < 13 ? Math.min(80, (h - 8) * 20 + noise)
-        : h < 15 ? 60 - (h - 13) * 30 + noise
-        : h < 20 ? -10 + (h - 15) * 5 + noise
-        : -40 - (h - 20) * 10 + noise;
-
-      const focus = h < 9 ? Math.max(0, h - 1)
-        : h < 12 ? Math.min(10, 4 + (h - 9) * 2 + noise * 0.05)
-        : h < 14 ? Math.max(2, 8 - (h - 12) * 2)
-        : h < 18 ? Math.min(10, 5 + (h - 14) + noise * 0.05)
-        : Math.max(0, 6 - (h - 18) * 1.5);
-
-      graphRows.push({
-        date,
-        hour,
-        productivity: Math.round(Math.min(100, Math.max(0, productivity))),
-        energy: Math.round(Math.min(100, Math.max(-100, energy))),
-        focus: Math.round(Math.min(10, Math.max(0, focus)) * 10) / 10,
-      });
-    }
-  }
-
-  await prisma.graphData.createMany({ data: graphRows });
-  console.log("📈 Created graph data");
+  // ── Graph data is now computed on-the-fly from real task/activity data ──
+  // The first request to /api/graph/daily?date=YYYY-MM-DD auto-calculates
+  // and caches the result in graph_data for subsequent reads.
+  console.log("📈 Graph data: calculated on-demand from real activity");
 
   // Create workspace settings
   await prisma.workspaceSetting.create({

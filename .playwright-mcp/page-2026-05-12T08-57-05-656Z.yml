@@ -1,0 +1,135 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - link "Skip to main content" [ref=e7] [cursor=pointer]:
+      - /url: "#a11y_target__create_project_main"
+    - generic [ref=e9]:
+      - alert [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: 
+          - generic [ref=e14]: "Information banner:"
+          - generic [ref=e15]:
+            - text: Keep your instance current and get the
+            - link "latest SonarQube Community Build" [ref=e16] [cursor=pointer]:
+              - /url: https://www.sonarsource.com/open-source-editions/sonarqube-community-edition/
+            - text: ", available now."
+        - button "Dismiss" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: 
+      - navigation "Main navigation" [ref=e19]:
+        - generic [ref=e20]:
+          - link "Link to home page" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img "SonarQube Community Build logo, link to homepage" [ref=e24]:
+              - img "SonarQube Community" [ref=e25]
+          - navigation "Main" [ref=e49]:
+            - list [ref=e51]:
+              - listitem [ref=e52]:
+                - link "Projects" [ref=e53] [cursor=pointer]:
+                  - /url: /projects
+              - listitem [ref=e54]:
+                - link "Issues" [ref=e55] [cursor=pointer]:
+                  - /url: /issues?issueStatuses=OPEN%2CCONFIRMED
+              - listitem [ref=e56]:
+                - link "Rules" [ref=e57] [cursor=pointer]:
+                  - /url: /coding_rules
+              - listitem [ref=e58]:
+                - link "Quality profiles" [ref=e59] [cursor=pointer]:
+                  - /url: /profiles
+              - listitem [ref=e60]:
+                - link "Quality gates" [ref=e61] [cursor=pointer]:
+                  - /url: /quality_gates
+              - listitem [ref=e62]:
+                - link "Administration" [ref=e63] [cursor=pointer]:
+                  - /url: /admin/settings
+              - listitem [ref=e64]:
+                - button "More" [ref=e65] [cursor=pointer]:
+                  - generic [ref=e66]:
+                    - generic [ref=e67]: More
+                    - generic [ref=e68]: 
+        - generic [ref=e69]:
+          - search [ref=e70]:
+            - button "Search" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: 
+          - button "Product news" [ref=e74] [cursor=pointer]:
+            - generic [ref=e75]: 
+          - button "Help" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: 
+          - button "Account" [ref=e78] [cursor=pointer]:
+            - img "Administrator" [ref=e79]: A
+      - generic [ref=e240]:
+        - main [ref=e241]:
+          - region "Set up new code for project" [ref=e242]:
+            - generic [ref=e243]:
+              - text: 2 of 2
+              - button "Clear" [ref=e244] [cursor=pointer]:
+                - generic [ref=e245]: 
+            - generic [ref=e246]:
+              - generic [ref=e248]:
+                - heading "Set up new code for project" [level=1] [ref=e249]
+                - generic [ref=e250]:
+                  - paragraph [ref=e251]: The new code definition sets the criteria for what's considered new code, allowing you to focus on the most recent changes in your project.
+                  - paragraph [ref=e252]: This setting allows project administrators to customize the new code definition for their project.
+                  - link "Learn more in documentation (opens in new tab)" [ref=e253] [cursor=pointer]:
+                    - /url: https://docs.sonarsource.com/sonarqube-community-build/user-guide/about-new-code/
+                    - text: Learn more in documentation
+                    - generic [ref=e254]: 
+                    - generic [ref=e255]: (opens in new tab)
+              - group [ref=e256]:
+                - radiogroup "Set up new code for project" [ref=e258]:
+                  - radio "Follows the instance’s default" [checked] [active] [ref=e259] [cursor=pointer]:
+                    - generic [ref=e260]:
+                      - generic [ref=e261]: Follows the instance’s default
+                      - generic [ref=e262]: "Current default: Previous version"
+                  - radio [checked]
+                  - radio "Is custom" [ref=e263] [cursor=pointer]:
+                    - generic [ref=e264]:
+                      - generic [ref=e265]: Is custom
+                      - generic [ref=e267]: Choose whether it should be the previous version, a number of days or a reference branch
+                  - radio
+              - generic [ref=e269]:
+                - button "Back" [ref=e270] [cursor=pointer]:
+                  - generic [ref=e272]: Back
+                - button "Create project" [ref=e296] [cursor=pointer]:
+                  - status [ref=e297]
+                  - generic [ref=e300]: Create project
+        - contentinfo [ref=e273]:
+          - generic [ref=e276]:
+            - text: SonarQube™ technology is powered by
+            - link "SonarSource Sàrl" [ref=e277] [cursor=pointer]:
+              - /url: https://www.sonarsource.com
+          - list [ref=e278]:
+            - listitem [ref=e279]: Community Build
+            - listitem [ref=e280]
+            - listitem [ref=e281]: v26.3.0.120487
+            - listitem [ref=e282]
+            - listitem
+            - listitem [ref=e283]
+            - listitem [ref=e284]: MQR Mode
+          - list [ref=e285]:
+            - listitem [ref=e286]:
+              - link "LGPL v3" [ref=e287] [cursor=pointer]:
+                - /url: https://www.gnu.org/licenses/lgpl-3.0.txt
+            - listitem [ref=e288]:
+              - link "Community" [ref=e289] [cursor=pointer]:
+                - /url: https://community.sonarsource.com/c/help/sq
+            - listitem [ref=e290]:
+              - link "Documentation" [ref=e291] [cursor=pointer]:
+                - /url: https://docs.sonarsource.com/sonarqube-community-build/
+            - listitem [ref=e292]:
+              - link "Plugins" [ref=e293] [cursor=pointer]:
+                - /url: https://docs.sonarsource.com/sonarqube-community-build/server-installation/plugins/plugin-version-matrix/
+            - listitem [ref=e294]:
+              - link "Web API" [ref=e295] [cursor=pointer]:
+                - /url: /web_api
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - heading "Introducing new, faster UI" [level=3] [ref=e162]
+        - generic [ref=e163]: Beta
+      - paragraph [ref=e164]: You're now beta testing our new UI. You can switch back and/or leave feedback in My account > Appearance.
+      - img "New sidebar navigation preview" [ref=e166]
+      - generic [ref=e167]:
+        - button "Got it" [ref=e168] [cursor=pointer]:
+          - generic [ref=e170]: Got it
+        - link "Go to Appearance" [ref=e171] [cursor=pointer]:
+          - /url: /account/appearance
+          - generic [ref=e173]: Go to Appearance
+  - region "Focus toasts messages with alt+T"

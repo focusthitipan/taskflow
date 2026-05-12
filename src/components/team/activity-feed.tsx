@@ -33,12 +33,18 @@ export function ActivityFeed({ activity }: ActivityFeedProps) {
             )}
 
             {/* Avatar */}
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 relative z-10"
-              style={{ backgroundColor: log.user?.avatarColor || "#422AFB" }}
-            >
-              {log.user?.firstName?.[0]}
-              {log.user?.lastName?.[0]}
+            <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 relative z-10">
+              {log.user?.avatarUrl ? (
+                <img src={log.user.avatarUrl} alt={log.user.firstName} className="w-full h-full object-cover" />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ backgroundColor: log.user?.avatarColor || "#EE5D50" }}
+                >
+                  {log.user?.firstName?.[0]}
+                  {log.user?.lastName?.[0]}
+                </div>
+              )}
             </div>
 
             {/* Content */}

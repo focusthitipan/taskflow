@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAuth, requireAdmin } from "@/lib/auth";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     let workspace = await db.workspaceSetting.findFirst();
 
@@ -37,6 +41,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const auth = await requireAdmin();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     let workspace = await db.workspaceSetting.findFirst();

@@ -15,7 +15,8 @@ import {
   subMonths,
 } from "date-fns";
 import { useT } from "@/components/layout/i18n-provider";
-import type { Task } from "@/types";
+import { TaskDetailModal } from "@/components/dashboard/task-detail-modal";
+import type { Task, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 
 const PRIORITY_COLORS = {
@@ -27,11 +28,20 @@ const PRIORITY_COLORS = {
 
 interface CalendarViewProps {
   tasks: Task[];
+  onTasksChange: (tasks: Task[]) => void;
+  currentUserRole?: UserRole;
+  currentUserId?: string;
 }
 
-export function CalendarView({ tasks }: CalendarViewProps) {
+export function CalendarView({ tasks, onTasksChange, currentUserRole, currentUserId }: CalendarViewProps) {
   const { t } = useT();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const handleTaskUpdate = (updatedTask: Task) => {
+    onTasksChange(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    setSelectedTask(updatedTask);
+  };
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -131,9 +141,10 @@ export function CalendarView({ tasks }: CalendarViewProps) {
                 </div>
                 <div className="space-y-1">
                   {dayTasks.slice(0, 3).map((task) => (
-                    <div
+                    <button
                       key={task.id}
-                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] bg-secondaryGray-300 dark:bg-navy-700"
+                      onClick={() => setSelectedTask(task)}
+                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] bg-secondaryGray-300 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-600 transition-colors duration-150 w-full text-left cursor-pointer"
                     >
                       <div
                         className={cn(
@@ -144,7 +155,7 @@ export function CalendarView({ tasks }: CalendarViewProps) {
                       <span className="text-[9px] font-medium text-secondaryGray-900 dark:text-white truncate">
                         {task.title}
                       </span>
-                    </div>
+                    </button>
                   ))}
                   {dayTasks.length > 3 && (
                     <p className="text-[9px] text-secondaryGray-600 font-normal pl-1">
@@ -157,6 +168,16 @@ export function CalendarView({ tasks }: CalendarViewProps) {
           })}
         </div>
       ))}
+
+      {selectedTask && (
+        <TaskDetailModal
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleTaskUpdate}
+          currentUserRole={currentUserRole}
+          currentUserId={currentUserId}
+        />
+      )}
     </div>
   );
 }

@@ -1,0 +1,189 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - generic [ref=e9]:
+      - alert [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: 
+          - generic [ref=e14]: "Information banner:"
+          - generic [ref=e15]:
+            - text: Keep your instance current and get the
+            - link "latest SonarQube Community Build" [ref=e16] [cursor=pointer]:
+              - /url: https://www.sonarsource.com/open-source-editions/sonarqube-community-edition/
+            - text: ", available now."
+        - button "Dismiss" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: 
+      - navigation "Main navigation" [ref=e19]:
+        - generic [ref=e20]:
+          - button "Undock sidebar" [ref=e301] [cursor=pointer]:
+            - generic [ref=e302]: 
+          - link "Link to home page" [ref=e22] [cursor=pointer]:
+            - /url: /
+            - img "SonarQube Community Build logo, link to homepage" [ref=e24]:
+              - img "SonarQube Community" [ref=e25]
+          - navigation "Main" [ref=e49]:
+            - list [ref=e51]:
+              - listitem [ref=e52]:
+                - link "Projects" [ref=e53] [cursor=pointer]:
+                  - /url: /projects
+              - listitem [ref=e54]:
+                - link "Issues" [ref=e55] [cursor=pointer]:
+                  - /url: /issues?issueStatuses=OPEN%2CCONFIRMED
+              - listitem [ref=e56]:
+                - link "Rules" [ref=e57] [cursor=pointer]:
+                  - /url: /coding_rules
+              - listitem [ref=e58]:
+                - link "Quality profiles" [ref=e59] [cursor=pointer]:
+                  - /url: /profiles
+              - listitem [ref=e60]:
+                - link "Quality gates" [ref=e61] [cursor=pointer]:
+                  - /url: /quality_gates
+              - listitem [ref=e62]:
+                - link "Administration" [ref=e63] [cursor=pointer]:
+                  - /url: /admin/settings
+              - listitem [ref=e64]:
+                - button "More" [ref=e65] [cursor=pointer]:
+                  - generic [ref=e66]:
+                    - generic [ref=e67]: More
+                    - generic [ref=e68]: 
+        - generic [ref=e69]:
+          - search [ref=e70]:
+            - button "Search" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: 
+          - button "Product news" [ref=e74] [cursor=pointer]:
+            - generic [ref=e75]: 
+          - button "Help" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: 
+          - button "Account" [ref=e78] [cursor=pointer]:
+            - img "Administrator" [ref=e79]: A
+      - navigation "Project" [ref=e304]:
+        - generic [ref=e306]:
+          - img "taskflow" [ref=e308]: T
+          - generic [ref=e309]:
+            - generic [ref=e311]: taskflow
+            - generic [ref=e312]: Project
+        - list [ref=e315]:
+          - listitem [ref=e316]:
+            - link "Project onboarding" [ref=e317] [cursor=pointer]:
+              - /url: /tutorials?id=taskflow
+              - generic [ref=e318]: 
+              - generic [ref=e319]: Project onboarding
+          - listitem [ref=e320]:
+            - group "Policies" [ref=e321]:
+              - generic [ref=e323]: Policies
+              - list [ref=e324]:
+                - listitem [ref=e325]:
+                  - link "Quality profiles" [ref=e326] [cursor=pointer]:
+                    - /url: /project/quality_profiles?id=taskflow
+                    - generic [ref=e327]: 
+                    - generic [ref=e328]: Quality profiles
+                - listitem [ref=e329]:
+                  - link "Quality gate" [ref=e330] [cursor=pointer]:
+                    - /url: /project/quality_gate?id=taskflow
+                    - generic [ref=e331]: 
+                    - generic [ref=e332]: Quality gate
+          - listitem [ref=e333]:
+            - group "Project" [ref=e334]:
+              - generic [ref=e336]: Project
+              - list [ref=e337]:
+                - listitem [ref=e338]:
+                  - link "Project information" [ref=e339] [cursor=pointer]:
+                    - /url: /project/information?id=taskflow
+                    - generic [ref=e340]: 
+                    - generic [ref=e341]: Project information
+          - listitem [ref=e342]:
+            - button "Project settings" [ref=e343] [cursor=pointer]:
+              - generic [ref=e344]: 
+              - generic [ref=e345]: Project settings
+              - generic [ref=e346]: 
+            - region "Project settings":
+              - list:
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+                - listitem
+      - generic [ref=e347]:
+        - generic [ref=e348]:
+          - banner [ref=e349]:
+            - generic [ref=e351]:
+              - link "taskflow" [ref=e353] [cursor=pointer]:
+                - /url: /dashboard?id=taskflow
+              - generic [ref=e415]: "0"
+              - link "Analysis Method" [ref=e416] [cursor=pointer]:
+                - /url: /tutorials?id=taskflow
+              - generic [ref=e417]: "0"
+              - generic [ref=e418]: Locally
+            - generic [ref=e356]:
+              - heading "Analyze your project" [level=1] [ref=e419]
+              - text: We initialized your project on SonarQube Community Build, now it's up to you to launch analyses!
+          - separator [ref=e359]
+        - generic [ref=e361]:
+          - main [ref=e362]:
+            - 'button "Provide a token Analyze \"taskflow\": sqp_b8906a038a23729774f602753e113324dbfb44de" [ref=e491] [cursor=pointer]':
+              - generic [ref=e421]:
+                - list [ref=e422]:
+                  - listitem [ref=e423]:
+                    - heading "Provide a token" [level=2] [ref=e424]
+                - generic [ref=e492]:
+                  - generic [ref=e493]: 
+                  - generic [ref=e494]:
+                    - text: "Analyze \"taskflow\":"
+                    - strong [ref=e495]: sqp_b8906a038a23729774f602753e113324dbfb44de
+            - list [ref=e475]:
+              - listitem [ref=e476]:
+                - heading "Run analysis on your project" [level=2] [ref=e477]
+                - generic [ref=e496]:
+                  - text: What option best describes your project?
+                  - radiogroup "What option best describes your project?" [ref=e498]:
+                    - radio "Maven" [ref=e499] [cursor=pointer]
+                    - radio "Gradle" [ref=e500] [cursor=pointer]
+                    - radio "JS/TS & Web" [ref=e501] [cursor=pointer]
+                    - radio ".NET" [ref=e502] [cursor=pointer]
+                    - radio "Python" [ref=e503] [cursor=pointer]
+                    - radio "Other (for Go, PHP, ...)" [ref=e504] [cursor=pointer]
+          - contentinfo [ref=e382]:
+            - generic [ref=e385]:
+              - text: SonarQube™ technology is powered by
+              - link "SonarSource Sàrl" [ref=e386] [cursor=pointer]:
+                - /url: https://www.sonarsource.com
+            - list [ref=e387]:
+              - listitem [ref=e388]: Community Build
+              - listitem [ref=e389]
+              - listitem [ref=e390]: v26.3.0.120487
+              - listitem [ref=e391]
+              - listitem
+              - listitem [ref=e392]
+              - listitem [ref=e393]: MQR Mode
+            - list [ref=e394]:
+              - listitem [ref=e395]:
+                - link "LGPL v3" [ref=e396] [cursor=pointer]:
+                  - /url: https://www.gnu.org/licenses/lgpl-3.0.txt
+              - listitem [ref=e397]:
+                - link "Community" [ref=e398] [cursor=pointer]:
+                  - /url: https://community.sonarsource.com/c/help/sq
+              - listitem [ref=e399]:
+                - link "Documentation" [ref=e400] [cursor=pointer]:
+                  - /url: https://docs.sonarsource.com/sonarqube-community-build/
+              - listitem [ref=e401]:
+                - link "Plugins" [ref=e402] [cursor=pointer]:
+                  - /url: https://docs.sonarsource.com/sonarqube-community-build/server-installation/plugins/plugin-version-matrix/
+              - listitem [ref=e403]:
+                - link "Web API" [ref=e404] [cursor=pointer]:
+                  - /url: /web_api
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - heading "Introducing new, faster UI" [level=3] [ref=e162]
+        - generic [ref=e163]: Beta
+      - paragraph [ref=e164]: You're now beta testing our new UI. You can switch back and/or leave feedback in My account > Appearance.
+      - img "New sidebar navigation preview" [ref=e166]
+      - generic [ref=e167]:
+        - button "Got it" [ref=e168] [cursor=pointer]:
+          - generic [ref=e170]: Got it
+        - link "Go to Appearance" [ref=e171] [cursor=pointer]:
+          - /url: /account/appearance
+          - generic [ref=e173]: Go to Appearance
+  - region "Focus toasts messages with alt+T"

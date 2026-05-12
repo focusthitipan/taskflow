@@ -7,9 +7,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect, useCallback } from "react";
 import { useSidebar } from "./sidebar-context";
 import { useT } from "./i18n-provider";
+import { useProfile } from "./profile-context";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@/types";
+import { SearchModal } from "./search-modal";
 
 export function Topbar() {
   const pathname = usePathname();
@@ -20,7 +22,19 @@ export function Topbar() {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Ctrl+K / Cmd+K to open search
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const userId = (session?.user as { id?: string })?.id;
 
@@ -51,18 +65,18 @@ export function Topbar() {
     fetchNotifications();
   }, [fetchNotifications]);
 
+  const { avatarUrl: userAvatarUrl, avatarColor: userAvatarColor, displayName } = useProfile();
+
   const title = PAGE_TITLES[pathname] || "TaskFlow";
   const unreadCount = notifications.filter((n) => !n.read).length;
   const user = session?.user;
-  const userName = user?.name || "User";
+  const userName = displayName || user?.name || "User";
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
-  const userAvatarUrl = (user as { avatarUrl?: string | null })?.avatarUrl;
-  const userAvatarColor = (user as { avatarColor?: string | null })?.avatarColor;
 
   const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 300;
 
@@ -122,15 +136,26 @@ export function Topbar() {
         {/* Right controls */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {/* Search — hidden on small screens, shown as icon button on mobile */}
-          <div className="hidden md:flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white/60 dark:bg-navy-700/60 min-w-[180px] lg:min-w-[200px]">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="hidden md:flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white/60 dark:bg-navy-700/60 min-w-[180px] lg:min-w-[200px] cursor-text"
+          >
             <Search className="w-4 h-4 text-secondaryGray-600 flex-shrink-0" />
-            <input
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              placeholder={t.topbar.search}
-              className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none min-w-0"
-            />
-          </div>
+            <span className="text-sm text-secondaryGray-600 font-normal flex-1 text-left">
+              {t.topbar.search}
+            </span>
+            <kbd className="hidden lg:inline-flex items-center gap-0.5 rounded-[8px] bg-secondaryGray-200 dark:bg-navy-900 px-1.5 py-0.5 text-[10px] text-secondaryGray-600 font-normal">
+              <span className="text-[10px]">⌘</span>K
+            </kbd>
+          </button>
+
+          {/* Mobile search icon */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="flex md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full items-center justify-center bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150"
+          >
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-secondaryGray-700 dark:text-white" />
+          </button>
 
           {/* Notifications */}
           <div className="relative">
@@ -244,7 +269,7 @@ export function Topbar() {
                 {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
                 <AvatarFallback
                   className="text-white text-xs font-bold"
-                  style={{ backgroundColor: userAvatarColor || "#422AFB" }}
+                  style={{ backgroundColor: userAvatarColor || "#EE5D50" }}
                 >
                   {userInitials}
                 </AvatarFallback>
@@ -291,6 +316,8 @@ export function Topbar() {
           </div>
         </div>
       </div>
+
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }

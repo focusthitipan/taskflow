@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import {
@@ -23,8 +23,14 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import type { ActivityLog, WorkspaceSettings } from "@/types";
 import { useAccent, ACCENT_PALETTES } from "@/components/layout/accent-provider";
+import { useProfile } from "@/components/layout/profile-context";
 
 type TabId = "profile" | "notifications" | "appearance" | "workspace" | "security";
+
+const AVATAR_COLORS = [
+  "#422AFB", "#01B574", "#FFB547", "#EE5D50", "#3965FF",
+  "#7551FF", "#3311DB", "#1b3bbb",
+];
 
 interface ProfileData {
   id: string;
@@ -42,6 +48,7 @@ interface ProfileData {
 function ProfileTab() {
   const { t, locale, setLocale } = useT();
   const { data: session } = useSession();
+  const { refreshProfile } = useProfile();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -77,6 +84,7 @@ function ProfileTab() {
       if (data.profile) {
         setProfile(data.profile);
         toast.success(t.settings.profileUpdated);
+        await refreshProfile();
       }
     } catch {
       toast.error(t.settings.failedUpdateProfile);
@@ -106,6 +114,7 @@ function ProfileTab() {
       if (data.avatarUrl) {
         setProfile((prev) => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
         toast.success(t.settings.avatarUpdated);
+        await refreshProfile();
       } else {
         toast.error(data.error || t.settings.failedUploadAvatar);
       }
@@ -124,6 +133,7 @@ function ProfileTab() {
       if (res.ok) {
         setProfile((prev) => prev ? { ...prev, avatarUrl: undefined } : prev);
         toast.success(t.settings.avatarRemoved);
+        await refreshProfile();
       } else {
         const data = await res.json();
         toast.error(data.error || t.settings.failedRemoveAvatar);
@@ -204,7 +214,7 @@ function ProfileTab() {
           ) : (
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-navy-800 card-shadow"
-              style={{ backgroundColor: profile.avatarColor || "#422AFB" }}
+              style={{ backgroundColor: profile.avatarColor || "#EE5D50" }}
             >
               {profile.firstName[0]}
               {profile.lastName[0]}
@@ -253,6 +263,28 @@ function ProfileTab() {
           <p className="text-[11px] text-secondaryGray-600 font-normal mt-2">
             {t.settings.avatarHint}
           </p>
+        </div>
+      </div>
+
+      {/* Avatar Color */}
+      <div>
+        <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-3">
+          Avatar Color
+        </label>
+        <div className="flex flex-wrap gap-3">
+          {AVATAR_COLORS.map((color) => (
+            <button
+              key={color}
+              onClick={() => setProfile({ ...profile, avatarColor: color })}
+              className={cn(
+                "w-9 h-9 rounded-full border-4 transition-all duration-150",
+                (profile.avatarColor || "#EE5D50") === color
+                  ? "border-secondaryGray-900 dark:border-white scale-110"
+                  : "border-transparent"
+              )}
+              style={{ backgroundColor: color }}
+            />
+          ))}
         </div>
       </div>
 
@@ -440,7 +472,9 @@ function NotificationsTab() {
       <p className="text-sm text-secondaryGray-600 font-normal">
         {t.settings.manageNotifications}
       </p>
-      {toggles.map((tg) => (
+      {toggles
+        .filter((tg) => tg.key !== "taskDue" && tg.key !== "teamActivity")
+        .map((tg) => (
         <div
           key={tg.key}
           className="flex items-center justify-between p-4 rounded-[20px] bg-secondaryGray-300 dark:bg-navy-700"
@@ -466,6 +500,26 @@ function NotificationsTab() {
           </button>
         </div>
       ))}
+      {/* Task Due — disabled / under development */}
+      <div className="flex items-center justify-between p-4 rounded-[20px] bg-secondaryGray-300 dark:bg-navy-700 opacity-60">
+        <div>
+          <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{t.settings.taskDue}</p>
+          <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{t.settings.underDevelopment}</p>
+        </div>
+        <div className="w-10 h-5 rounded-full p-0.5 flex items-center bg-secondaryGray-600 cursor-not-allowed">
+          <div className="w-4 h-4 rounded-full bg-white/50 translate-x-0" />
+        </div>
+      </div>
+      {/* Team Activity — disabled / under development */}
+      <div className="flex items-center justify-between p-4 rounded-[20px] bg-secondaryGray-300 dark:bg-navy-700 opacity-60">
+        <div>
+          <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{t.settings.teamActivity}</p>
+          <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{t.settings.underDevelopment}</p>
+        </div>
+        <div className="w-10 h-5 rounded-full p-0.5 flex items-center bg-secondaryGray-600 cursor-not-allowed">
+          <div className="w-4 h-4 rounded-full bg-white/50 translate-x-0" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -711,16 +765,26 @@ function SecurityTab() {
   const { t } = useT();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1, limit: 15 });
+
+  const fetchLogs = useCallback(async (p: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/settings/audit-log?page=${p}&limit=15`);
+      const data = await res.json();
+      if (data.logs) setLogs(data.logs);
+      if (data.pagination) setPagination(data.pagination);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    fetch("/api/settings/audit-log")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.logs) setLogs(d.logs);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    fetchLogs(page);
+  }, [fetchLogs, page]);
 
   if (loading) {
     return (
@@ -734,9 +798,6 @@ function SecurityTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white">{t.settings.auditLog}</h3>
-        <button className="text-xs text-brand-500 font-medium hover:opacity-80 transition-opacity">
-          {t.users.exportCsv}
-        </button>
       </div>
       <div className="bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
         {logs.length === 0 ? (
@@ -769,12 +830,18 @@ function SecurityTab() {
                 >
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                        style={{ backgroundColor: log.user?.avatarColor || "#422AFB" }}
-                      >
-                        {log.user?.firstName?.[0]}
-                        {log.user?.lastName?.[0]}
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center overflow-hidden">
+                        {log.user?.avatarUrl ? (
+                          <img src={log.user.avatarUrl} alt={log.user.firstName} className="w-full h-full object-cover" />
+                        ) : (
+                          <div
+                            className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                            style={{ backgroundColor: log.user?.avatarColor || "#EE5D50" }}
+                          >
+                            {log.user?.firstName?.[0]}
+                            {log.user?.lastName?.[0]}
+                          </div>
+                        )}
                       </div>
                       <span className="text-sm font-bold text-secondaryGray-900 dark:text-white">
                         {log.user?.firstName} {log.user?.lastName}
@@ -802,6 +869,29 @@ function SecurityTab() {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="w-9 h-9 rounded-[10px] flex items-center justify-center text-sm font-bold text-secondaryGray-600 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 disabled:opacity-40 disabled:pointer-events-none transition-colors duration-150"
+          >
+            ‹
+          </button>
+          <span className="text-sm text-secondaryGray-600 font-normal">
+            {page} / {pagination.totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+            disabled={page >= pagination.totalPages}
+            className="w-9 h-9 rounded-[10px] flex items-center justify-center text-sm font-bold text-secondaryGray-600 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 disabled:opacity-40 disabled:pointer-events-none transition-colors duration-150"
+          >
+            ›
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -835,7 +925,7 @@ export default function SettingsPage() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[260px_1fr] gap-5">
       {/* Tab nav */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-3 card-shadow h-fit xl:sticky xl:top-[140px]">
+      <div className="stagger stagger-1 bg-white dark:bg-navy-800 rounded-[20px] p-3 card-shadow h-fit xl:sticky xl:top-[140px]">
         {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -861,7 +951,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab content */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-4 sm:p-6 card-shadow">
+      <div className="stagger stagger-2 bg-white dark:bg-navy-800 rounded-[20px] p-4 sm:p-6 card-shadow">
         <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-6">
           {visibleTabs.find((tb) => tb.id === activeTab)?.label}
         </h2>

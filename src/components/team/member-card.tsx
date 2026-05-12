@@ -29,18 +29,20 @@ export function MemberCard({ member }: MemberCardProps) {
         {/* Avatar */}
         <div className="relative">
           <div
-            className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-bold border-4 border-white dark:border-navy-800"
-            style={{ backgroundColor: member.avatarColor || "#422AFB" }}
+            className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden border-4 border-white dark:border-navy-800"
           >
-            {member.firstName[0]}
-            {member.lastName[0]}
-          </div>
-          <div
-            className={cn(
-              "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white dark:border-navy-800",
-              member.isOnline ? "bg-green-500" : "bg-secondaryGray-600"
+            {member.avatarUrl ? (
+              <img src={member.avatarUrl} alt={`${member.firstName} ${member.lastName}`} className="w-full h-full object-cover" />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-white text-lg font-bold"
+                style={{ backgroundColor: member.avatarColor || "#EE5D50" }}
+              >
+                {member.firstName[0]}
+                {member.lastName[0]}
+              </div>
             )}
-          />
+          </div>
         </div>
 
         {/* Role badge */}
@@ -92,14 +94,6 @@ export function MemberCard({ member }: MemberCardProps) {
             style={{ width: `${completionRate}%` }}
           />
         </div>
-      </div>
-
-      <div className="mt-3 text-xs text-secondaryGray-600 font-normal">
-        {member.isOnline ? (
-          <span className="text-green-500 font-medium">● {t.team.online}</span>
-        ) : (
-          <span>● {t.team.offline}</span>
-        )}
       </div>
     </div>
   );

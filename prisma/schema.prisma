@@ -18,7 +18,10 @@ model User {
   avatarUrl   String?
   timezone    String?  @default("UTC+7")
   language    String?  @default("en")
-  isOnline    Boolean  @default(false)
+  notifTaskAssigned  Boolean @default(true)
+  notifTaskDue       Boolean @default(true)
+  notifCommentMention Boolean @default(true)
+  notifTeamActivity  Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -118,19 +121,6 @@ model ActivityLog {
   task Task? @relation(fields: [targetId], references: [id], onDelete: SetNull)
 
   @@map("activity_logs")
-}
-
-model GraphData {
-  id           String   @id @default(cuid())
-  date         String
-  hour         String
-  productivity Int      @default(0)
-  energy       Int      @default(0)
-  focus        Float    @default(0)
-  createdAt    DateTime @default(now())
-
-  @@unique([date, hour])
-  @@map("graph_data")
 }
 
 model Notification {

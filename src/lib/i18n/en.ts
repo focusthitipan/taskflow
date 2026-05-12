@@ -1,6 +1,11 @@
 import { Translations } from "./types";
 
 const en: Translations = {
+  notFound: {
+    title: "Page Not Found",
+    description: "The page you're looking for doesn't exist or has been moved.",
+    backHome: "Back to Dashboard",
+  },
   common: {
     save: "Save",
     cancel: "Cancel",
@@ -74,6 +79,8 @@ const en: Translations = {
     unassigned: "Unassigned",
     daysLeft: "d left",
     daysOverdue: "d overdue",
+    workDaysLeft: "wd left",
+    workDaysOverdue: "wd overdue",
     noDescription: "No description provided.",
     comments: "Comments",
     addComment: "Add a comment...",
@@ -236,6 +243,7 @@ const en: Translations = {
     commentMentionDesc: "When someone mentions you",
     teamActivity: "Team Activity",
     teamActivityDesc: "Weekly team digest email",
+    underDevelopment: "Under Development",
     failedSavePreferences: "Failed to save preferences",
     colorMode: "Color Mode",
     light: "Light",
@@ -255,6 +263,12 @@ const en: Translations = {
     auditLog: "Audit Log",
     noAuditLogs: "No audit logs found.",
     when: "When",
+  },
+  search: {
+    placeholder: "Search by task name, priority, or status...",
+    noResults: "No tasks found",
+    searchingFor: "Tasks",
+    hint: "Try typing a task name, priority (urgent, high, medium, low), or status (todo, in progress, done)",
   },
   login: {
     welcomeBack: "Welcome back",

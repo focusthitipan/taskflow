@@ -1,0 +1,55 @@
+- generic [ref=e2]:
+  - generic [ref=e8]:
+    - main [ref=e9]:
+      - generic [ref=e12]:
+        - img "SonarQube Server" [ref=e13]
+        - heading "Welcome to SonarQube" [level=1] [ref=e35]
+        - status [ref=e36]
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e41]:
+              - generic [ref=e43]: Username*
+              - textbox "Username" [ref=e45]:
+                - /placeholder: Enter your username
+            - generic [ref=e47]:
+              - generic [ref=e49]: Password*
+              - generic [ref=e50]:
+                - textbox "Password" [ref=e51]:
+                  - /placeholder: Enter your password
+                - button "Show password" [ref=e53] [cursor=pointer]:
+                  - generic [ref=e54]: 
+          - generic [ref=e56]:
+            - button "Log in" [disabled] [expanded]:
+              - generic:
+                - generic: Log in
+      - generic [ref=e58]:
+        - img "SonarQube whale logo"
+        - generic [ref=e59]:
+          - status [ref=e60]
+          - generic [ref=e62]:
+            - img "Sonar logo" [ref=e63]
+            - 'heading "SonarQube Server: Your independent code verification layer" [level=1] [ref=e64]'
+            - text: SonarQube Server provides deep analysis to ensure all your code, human-written and AI-generated, is secure and high quality.
+            - list [ref=e65]:
+              - listitem [ref=e66]: "Continuous Verification: Automatically reviews your code in real-time, helping you eliminate security risks, bugs, and technical debt before they reach production."
+              - listitem [ref=e67]: "DevSecOps integrated: Works seamlessly within your existing CI/CD workflow, including integrations with tools like GitHub Actions, GitLab CI/CD, and Jenkins."
+              - listitem [ref=e68]: "Empowering developers: SonarQube for IDE in connected mode enables developers to receive real-time, actionable code intelligence and guidance to resolve issues quickly."
+    - contentinfo [ref=e69]:
+      - generic [ref=e72]:
+        - text: SonarQube™ technology is powered by
+        - link "SonarSource Sàrl" [ref=e73] [cursor=pointer]:
+          - /url: https://www.sonarsource.com
+      - list [ref=e74]:
+        - listitem [ref=e75]:
+          - link "Terms & Conditions" [ref=e76] [cursor=pointer]:
+            - /url: https://www.sonarsource.com/legal/sonarqube/terms-and-conditions/
+        - listitem [ref=e77]:
+          - link "Community" [ref=e78] [cursor=pointer]:
+            - /url: https://community.sonarsource.com/c/help/sq
+        - listitem [ref=e79]:
+          - link "Documentation" [ref=e80] [cursor=pointer]:
+            - /url: https://docs.sonarsource.com/sonarqube/latest/
+        - listitem [ref=e81]:
+          - link "Plugins" [ref=e82] [cursor=pointer]:
+            - /url: https://docs.sonarsource.com/sonarqube/latest/server-installation/plugins/plugin-version-matrix/
+  - region "Focus toasts messages with alt+T"
