@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <SessionProvider>
       <SidebarProvider>
-        <div className="min-h-screen bg-secondaryGray-300 dark:bg-navy-900">
+        <div className="min-h-screen bg-brand-50 dark:bg-navy-900">
           <Sidebar />
           <MainContent>
             <Topbar />

@@ -63,26 +63,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-secondaryGray-300 dark:bg-navy-900 flex items-center justify-center p-5">
+    <div className="min-h-screen bg-brand-50 dark:bg-navy-900 flex items-center justify-center p-5">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-10"
-          style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
-        />
-        <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-10"
-          style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
-        />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-10 gradient-brand" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-10 gradient-brand" />
       </div>
 
       <div className="w-full max-w-[440px] relative">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
-          >
+          <div className="w-12 h-12 rounded-full flex items-center justify-center gradient-brand">
             <Zap className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -156,8 +147,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-[44px] rounded-full text-white font-bold text-sm transition-all duration-250 ease flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-              style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
+              className="w-full h-[44px] rounded-full text-white font-bold text-sm transition-all duration-250 ease flex items-center justify-center gap-2 mt-2 disabled:opacity-60 gradient-brand"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -181,7 +171,7 @@ export default function LoginPage() {
                   key={acc.email}
                   type="button"
                   onClick={() => fillDemo(acc.email, acc.password)}
-                  className="flex items-center gap-2 p-3 rounded-[10px] bg-secondaryGray-300 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150 text-left"
+                  className="flex items-center gap-2 p-3 rounded-[10px] bg-brand-50 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150 text-left"
                 >
                   <div
                     className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"

@@ -104,6 +104,27 @@ export async function GET(request: Request) {
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
   const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "6", 10)));
 
+  // Map search keywords to priority/status values for unified search
+  const priorityMap: Record<string, string[]> = {
+    urgent: ["urgent"],
+    high: ["high"],
+    medium: ["medium"],
+    low: ["low"],
+  };
+  const statusMap: Record<string, string[]> = {
+    todo: ["todo"],
+    "to do": ["todo"],
+    "in progress": ["in_progress"],
+    "in_progress": ["in_progress"],
+    done: ["done"],
+    completed: ["done"],
+    complete: ["done"],
+  };
+
+  const searchLower = search.toLowerCase().trim();
+  const matchedPriorities = priorityMap[searchLower] || [];
+  const matchedStatuses = statusMap[searchLower] || [];
+
   const where = {
     AND: [
       search
@@ -112,6 +133,12 @@ export async function GET(request: Request) {
               { title: { contains: search, mode: "insensitive" as const } },
               { description: { contains: search, mode: "insensitive" as const } },
               { project: { contains: search, mode: "insensitive" as const } },
+              ...(matchedPriorities.length > 0
+                ? [{ priority: { in: matchedPriorities as TaskPriority[] } }]
+                : []),
+              ...(matchedStatuses.length > 0
+                ? [{ status: { in: matchedStatuses as TaskStatus[] } }]
+                : []),
             ],
           }
         : {},

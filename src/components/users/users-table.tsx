@@ -67,7 +67,7 @@ export function UsersTable({
     <div className="space-y-4">
       {/* Table */}
       <div className="bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-secondaryGray-100 dark:border-white/10">

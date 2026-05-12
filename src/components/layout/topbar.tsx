@@ -156,7 +156,7 @@ export function Topbar() {
                       </button>
                     )}
                   </div>
-                  <div className="max-h-[300px] overflow-y-auto">
+                  <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                     {notifLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="w-5 h-5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />

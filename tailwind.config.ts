@@ -61,6 +61,7 @@ export default {
         },
         // Brand palette (driven by CSS variables for dynamic accent color)
         brand: {
+          50: "hsl(var(--brand-50))",
           100: "hsl(var(--brand-100))",
           400: "hsl(var(--brand-400))",
           500: "hsl(var(--brand-500))",

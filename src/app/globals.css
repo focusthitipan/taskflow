@@ -12,7 +12,7 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 249 97% 57%;
+    --primary: var(--brand-500);
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -24,26 +24,27 @@
     --destructive-foreground: 0 0% 98%;
     --border: 220 26% 91%;
     --input: 220 26% 91%;
-    --ring: 249 97% 57%;
-    --chart-1: 249 97% 57%;
+    --ring: var(--brand-500);
+    --chart-1: var(--brand-500);
     --chart-2: 160 60% 45%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 1rem;
-    --brand-100: 251 100% 95%;
-    --brand-400: 255 100% 66%;
-    --brand-500: 249 97% 57%;
-    --brand-600: 250 86% 46%;
-    --brand-900: 238 95% 15%;
+    --brand-50: 4 30% 98%;
+    --brand-100: 4 76% 96%;
+    --brand-400: 4 80% 70%;
+    --brand-500: 4 80% 62%;
+    --brand-600: 4 72% 52%;
+    --brand-900: 4 70% 25%;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 249 97% 57%;
+    --sidebar-primary: var(--brand-500);
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 26% 91%;
-    --sidebar-ring: 249 97% 57%;
+    --sidebar-ring: var(--brand-500);
   }
 
   .dark {
@@ -53,7 +54,7 @@
     --card-foreground: 0 0% 98%;
     --popover: 228 59% 17%;
     --popover-foreground: 0 0% 98%;
-    --primary: 249 100% 67%;
+    --primary: var(--brand-500);
     --primary-foreground: 0 0% 9%;
     --secondary: 228 59% 17%;
     --secondary-foreground: 0 0% 98%;
@@ -65,12 +66,13 @@
     --destructive-foreground: 0 0% 98%;
     --border: 229 40% 25%;
     --input: 229 40% 25%;
-    --ring: 249 100% 67%;
-    --chart-1: 249 100% 67%;
+    --ring: var(--brand-500);
+    --chart-1: var(--brand-500);
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --brand-50: 249 30% 98%;
     --brand-100: 251 100% 95%;
     --brand-400: 249 100% 67%;
     --brand-500: 249 100% 67%;
@@ -78,12 +80,12 @@
     --brand-900: 238 80% 85%;
     --sidebar-background: 228 59% 17%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 249 100% 67%;
+    --sidebar-primary: var(--brand-500);
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 228 59% 20%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 229 40% 25%;
-    --sidebar-ring: 249 100% 67%;
+    --sidebar-ring: var(--brand-500);
   }
 }
 
@@ -145,5 +147,84 @@
 
   .card-shadow {
     box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+  }
+
+  /* =============================================
+     Custom Scrollbar — glassmorphic thin scrollbar
+     ============================================= */
+
+  /* Firefox */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--brand-500) / 0.3) transparent;
+  }
+
+  .dark html {
+    scrollbar-color: hsl(var(--brand-500) / 0.25) transparent;
+  }
+
+  /* WebKit (Chrome, Edge, Safari) */
+  html::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background: hsl(var(--brand-500) / 0.25);
+    border-radius: 3px;
+    transition: background 250ms ease;
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand-500) / 0.45);
+  }
+
+  .dark html::-webkit-scrollbar-thumb {
+    background: hsl(var(--brand-500) / 0.2);
+  }
+
+  .dark html::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand-500) / 0.35);
+  }
+
+  /* In-component scrollable containers */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--brand-500) / 0.2) transparent;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: hsl(var(--brand-500) / 0.18) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--brand-500) / 0.18);
+    border-radius: 2.5px;
+    transition: background 250ms ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand-500) / 0.35);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--brand-500) / 0.15);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--brand-500) / 0.28);
   }
 }

@@ -9,6 +9,7 @@ interface AccentPalette {
   label: string;
   hex: string;
   hsl: {
+    50: string;
     100: string;
     400: string;
     500: string;
@@ -23,6 +24,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Brand Violet",
     hex: "#422AFB",
     hsl: {
+      50: "249 50% 98%",
       100: "251 100% 95%",
       400: "255 100% 66%",
       500: "249 97% 57%",
@@ -35,6 +37,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Mint Green",
     hex: "#01B574",
     hsl: {
+      50: "160 40% 98%",
       100: "160 100% 96%",
       400: "160 84% 55%",
       500: "162 99% 36%",
@@ -47,6 +50,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Amber",
     hex: "#FFB547",
     hsl: {
+      50: "46 50% 98%",
       100: "46 100% 96%",
       400: "42 100% 72%",
       500: "41 100% 64%",
@@ -59,6 +63,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Coral",
     hex: "#EE5D50",
     hsl: {
+      50: "4 30% 98%",
       100: "4 76% 96%",
       400: "4 80% 70%",
       500: "4 80% 62%",
@@ -71,6 +76,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Royal Blue",
     hex: "#3965FF",
     hsl: {
+      50: "220 50% 98%",
       100: "220 100% 96%",
       400: "224 100% 70%",
       500: "226 100% 61%",
@@ -83,6 +89,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
     label: "Purple",
     hex: "#7551FF",
     hsl: {
+      50: "255 40% 98%",
       100: "255 100% 97%",
       400: "255 100% 75%",
       500: "255 100% 66%",
@@ -93,6 +100,7 @@ export const ACCENT_PALETTES: AccentPalette[] = [
 ];
 
 const DARK_HSL: Record<string, string> = {
+  50: "249 30% 98%",
   100: "251 100% 95%",
   400: "249 100% 67%",
   500: "249 100% 67%",
@@ -121,12 +129,14 @@ export function useAccent() {
 function applyPalette(palette: AccentPalette, isDark: boolean) {
   const root = document.documentElement;
   if (isDark) {
+    root.style.setProperty("--brand-50", DARK_HSL[50]!);
     root.style.setProperty("--brand-100", DARK_HSL[100]!);
     root.style.setProperty("--brand-400", DARK_HSL[400]!);
     root.style.setProperty("--brand-500", DARK_HSL[500]!);
     root.style.setProperty("--brand-600", DARK_HSL[600]!);
     root.style.setProperty("--brand-900", DARK_HSL[900]!);
   } else {
+    root.style.setProperty("--brand-50", palette.hsl[50]);
     root.style.setProperty("--brand-100", palette.hsl[100]);
     root.style.setProperty("--brand-400", palette.hsl[400]);
     root.style.setProperty("--brand-500", palette.hsl[500]);
@@ -136,7 +146,7 @@ function applyPalette(palette: AccentPalette, isDark: boolean) {
 }
 
 export function AccentProvider({ children }: { children: React.ReactNode }) {
-  const [accent, setAccentState] = useState<AccentId>("violet");
+  const [accent, setAccentState] = useState<AccentId>("coral");
   const [hydrated, setHydrated] = useState(false);
 
   // Hydrate from localStorage on mount (before apply)

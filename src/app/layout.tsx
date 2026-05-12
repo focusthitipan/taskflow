@@ -7,6 +7,20 @@ import { AccentProvider } from "@/components/layout/accent-provider";
 export const metadata: Metadata = {
   title: "TaskFlow — Team Task Management",
   description: "Modern task management for high-performing teams",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon.ico"],
+  },
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "TaskFlow",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({

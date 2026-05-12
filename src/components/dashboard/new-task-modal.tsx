@@ -99,7 +99,7 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
           {/* Title */}
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">

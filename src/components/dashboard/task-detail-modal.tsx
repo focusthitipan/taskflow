@@ -73,7 +73,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-2xl max-h-[90vh] overflow-y-auto card-shadow">
+      <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-2xl max-h-[90vh] overflow-y-auto card-shadow custom-scrollbar">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
           <div className="flex-1 min-w-0 pr-4">
@@ -104,14 +104,26 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 <span className="text-xs text-secondaryGray-600 font-normal">{task.project}</span>
               )}
             </div>
+            {/* Tags */}
+            {task.tags && task.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {task.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs font-medium px-2 py-0.5 rounded-[10px] bg-brand-100 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {editing ? (
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white transition-colors duration-150 disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white transition-colors duration-150 disabled:opacity-60 gradient-brand"
               >
                 <Save className="w-3.5 h-3.5" />
                 {saving ? "Saving..." : "Save"}
@@ -262,6 +274,43 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                       {task.progress || 0}%
                     </span>
                   </div>
+                </div>
+              )}
+            </div>
+
+            <div className="col-span-2">
+              <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
+                <Tag className="w-3.5 h-3.5" /> Tags
+              </label>
+              {editing ? (
+                <input
+                  value={(form.tags || []).join(", ")}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      tags: e.target.value
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  placeholder="e.g. Feature, Bug, UI"
+                  className="w-full h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
+                />
+              ) : (
+                <div className="flex flex-wrap gap-1">
+                  {task.tags && task.tags.length > 0 ? (
+                    task.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs font-medium px-2 py-0.5 rounded-[10px] bg-brand-100 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400"
+                      >
+                        {tag}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-secondaryGray-600 font-normal">—</span>
+                  )}
                 </div>
               )}
             </div>

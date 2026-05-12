@@ -189,7 +189,7 @@ export default function GraphPage() {
 
       {/* Data table */}
       {!loading && data.length > 0 && (
-        <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto">
+        <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto custom-scrollbar">
           <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
             Hourly Data
           </h3>

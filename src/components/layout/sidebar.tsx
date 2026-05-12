@@ -95,8 +95,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 pt-8 pb-6 flex-shrink-0">
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ background: "linear-gradient(135deg, #868CFF 0%, #4318FF 100%)" }}
+          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 gradient-brand"
         >
           <Zap className="w-5 h-5 text-white" />
         </div>
@@ -108,7 +107,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
         {NAV_ITEMS.map((item) => (
           <NavItem key={item.href} {...item} />
         ))}
