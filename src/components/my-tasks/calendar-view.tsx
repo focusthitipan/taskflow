@@ -175,6 +175,10 @@ export function CalendarView({ tasks, onTasksChange, currentUserRole, currentUse
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
+          onDelete={() => {
+            onTasksChange(tasks.filter((t) => t.id !== selectedTask.id));
+            setSelectedTask(null);
+          }}
           currentUserRole={currentUserRole}
           currentUserId={currentUserId}
         />

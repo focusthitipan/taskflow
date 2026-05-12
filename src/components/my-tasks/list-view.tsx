@@ -188,6 +188,10 @@ export function ListView({ tasks, onTasksChange, currentUserRole, currentUserId 
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
+          onDelete={() => {
+            onTasksChange(tasks.filter((t) => t.id !== selectedTask.id));
+            setSelectedTask(null);
+          }}
           currentUserRole={currentUserRole}
           currentUserId={currentUserId}
         />

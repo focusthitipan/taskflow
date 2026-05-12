@@ -230,6 +230,10 @@ export function KanbanBoard({ tasks, onTasksChange, currentUserRole, currentUser
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
+          onDelete={() => {
+            onTasksChange(tasks.filter((t) => t.id !== selectedTask.id));
+            setSelectedTask(null);
+          }}
           currentUserRole={currentUserRole}
           currentUserId={currentUserId}
         />

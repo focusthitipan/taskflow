@@ -95,8 +95,14 @@ export interface Translations {
     addComment: string;
     commentAdded: string;
     failedAddComment: string;
+    commentDeleted: string;
+    failedDeleteComment: string;
     taskUpdated: string;
     failedUpdateTask: string;
+    taskDeleted: string;
+    failedDeleteTask: string;
+    deleteTask: string;
+    deleteTaskWarning: string;
     tags: string;
     egTags: string;
     enterTaskTitle: string;

@@ -212,6 +212,11 @@ function DashboardContent() {
             setSelectedTask(updated);
             fetchTasks();
           }}
+          onDelete={() => {
+            setSelectedTask(null);
+            globalThis.history.replaceState({}, "", "/dashboard");
+            fetchTasks();
+          }}
           currentUserRole={currentUserRole}
           currentUserId={currentUserId}
         />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { X, Edit2, Save, Calendar, Tag, User, AlertCircle, MessageSquare } from "lucide-react";
+import { X, Edit2, Save, Calendar, Tag, User, AlertCircle, MessageSquare, Trash2 } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { Task, TaskPriority, TaskStatus, UserRole } from "@/types";
 import { useT } from "@/components/layout/i18n-provider";
@@ -21,11 +21,12 @@ interface TaskDetailModalProps {
   readonly task: Task;
   readonly onClose: () => void;
   readonly onUpdate: (task: Task) => void;
+  readonly onDelete?: () => void;
   readonly currentUserRole?: UserRole;
   readonly currentUserId?: string;
 }
 
-export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, currentUserId }: TaskDetailModalProps) {
+export function TaskDetailModal({ task, onClose, onUpdate, onDelete, currentUserRole, currentUserId }: TaskDetailModalProps) {
   const canEdit = canEditTask(currentUserRole, currentUserId, task);
   const canComment = canCreateTask(currentUserRole);
   const { t, locale } = useT();
@@ -33,6 +34,8 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
   const [form, setForm] = useState({ ...task });
   const [newComment, setNewComment] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [tagsError, setTagsError] = useState("");
@@ -119,6 +122,31 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
       }
     } catch {
       toast.error(t.dashboard.failedAddComment);
+    }
+  };
+
+  const deleteTask = async () => {
+    setDeleting(true);
+    try {
+      await fetch(`/api/tasks/${task.id}`, { method: "DELETE" });
+      toast.success(t.dashboard.taskDeleted);
+      if (onDelete) onDelete();
+      else onClose();
+    } catch {
+      toast.error(t.dashboard.failedDeleteTask);
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    try {
+      await fetch(`/api/tasks/${task.id}/comments/${commentId}`, { method: "DELETE" });
+      setForm((f) => ({ ...f, comments: (f.comments || []).filter((c) => c.id !== commentId) }));
+      toast.success(t.dashboard.commentDeleted);
+    } catch {
+      toast.error(t.dashboard.failedDeleteComment);
     }
   };
 
@@ -274,6 +302,15 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
                 {t.common.edit}
               </button>
             )}
+            {!editing && canEdit && (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                title={t.dashboard.deleteTask}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
@@ -282,6 +319,28 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
             </button>
           </div>
         </div>
+
+        {confirmDelete && (
+          <div className="px-6 py-4 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/40 flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-600 dark:text-red-400 font-normal flex-1">{t.dashboard.deleteTaskWarning}</p>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-secondaryGray-600 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
+              >
+                {t.common.cancel}
+              </button>
+              <button
+                onClick={deleteTask}
+                disabled={deleting}
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-white bg-red-500 hover:bg-red-600 transition-colors duration-150 disabled:opacity-60"
+              >
+                {deleting ? "..." : t.dashboard.deleteTask}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="p-6 space-y-6">
           {/* Description */}
@@ -515,36 +574,48 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
               <MessageSquare className="w-4 h-4" /> {t.dashboard.comments} ({form.comments?.length || 0})
             </label>
             <div className="space-y-3 mb-4">
-              {(form.comments || []).map((comment) => (
-                <div key={comment.id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {comment.user?.avatarUrl ? (
-                      <img src={comment.user.avatarUrl} alt={comment.user.firstName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div
-                        className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
-                        style={{ backgroundColor: comment.user?.avatarColor || "#EE5D50" }}
-                      >
-                        {comment.user?.firstName?.[0]}
-                        {comment.user?.lastName?.[0]}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-secondaryGray-900 dark:text-white">
-                        {comment.user?.firstName} {comment.user?.lastName}
-                      </span>
-                      <span className="text-[10px] text-secondaryGray-600 font-normal">
-                        {formatDistanceToNow(parseISO(comment.createdAt), { addSuffix: true })}
-                      </span>
+              {(form.comments || []).map((comment) => {
+                const canDeleteComment = currentUserRole === "admin" || comment.userId === currentUserId;
+                return (
+                  <div key={comment.id} className="flex gap-3 group">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {comment.user?.avatarUrl ? (
+                        <img src={comment.user.avatarUrl} alt={comment.user.firstName} className="w-full h-full object-cover" />
+                      ) : (
+                        <div
+                          className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                          style={{ backgroundColor: comment.user?.avatarColor || "#EE5D50" }}
+                        >
+                          {comment.user?.firstName?.[0]}
+                          {comment.user?.lastName?.[0]}
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-secondaryGray-700 dark:text-secondaryGray-300 font-normal leading-[150%]">
-                      {comment.content}
-                    </p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-secondaryGray-900 dark:text-white">
+                          {comment.user?.firstName} {comment.user?.lastName}
+                        </span>
+                        <span className="text-[10px] text-secondaryGray-600 font-normal">
+                          {formatDistanceToNow(parseISO(comment.createdAt), { addSuffix: true })}
+                        </span>
+                        {canDeleteComment && (
+                          <button
+                            onClick={() => deleteComment(comment.id)}
+                            className="ml-auto opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded text-secondaryGray-400 hover:text-red-500 transition-all duration-150"
+                            title={t.common.delete}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-sm text-secondaryGray-700 dark:text-secondaryGray-300 font-normal leading-[150%]">
+                        {comment.content}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {canComment && (
             <div className="flex gap-3">
