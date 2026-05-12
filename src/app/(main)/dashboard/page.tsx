@@ -98,8 +98,8 @@ export default function DashboardPage() {
         setShowNewTask(false);
       }
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    globalThis.addEventListener("keydown", handler);
+    return () => globalThis.removeEventListener("keydown", handler);
   }, []);
 
   const handleTaskCreated = () => {
@@ -151,11 +151,10 @@ export default function DashboardPage() {
             </div>
           )}
           <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">
-            {isWorkingDay(workingDays)
-              ? isWithinBusinessHours(businessHoursStart, businessHoursEnd)
-                ? "● On Duty"
-                : "○ Off Hours"
-              : "○ Day Off"}
+            {(() => {
+              if (!isWorkingDay(workingDays)) return "○ Day Off";
+              return isWithinBusinessHours(businessHoursStart, businessHoursEnd) ? "● On Duty" : "○ Off Hours";
+            })()}
           </p>
         </div>
       </div>
@@ -209,7 +208,7 @@ export default function DashboardPage() {
           task={selectedTask}
           onClose={() => {
             setSelectedTask(null);
-            window.history.replaceState({}, "", "/dashboard");
+            globalThis.history.replaceState({}, "", "/dashboard");
           }}
           onUpdate={(updated) => {
             setSelectedTask(updated);

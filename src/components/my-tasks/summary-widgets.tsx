@@ -6,7 +6,7 @@ import type { Task } from "@/types";
 import { differenceInDays, parseISO } from "date-fns";
 
 interface SummaryWidgetsProps {
-  tasks: Task[];
+  readonly tasks: Task[];
 }
 
 export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {

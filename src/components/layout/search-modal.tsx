@@ -33,8 +33,8 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
 };
 
 interface SearchModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
 }
 
 export function SearchModal({ open, onOpenChange }: SearchModalProps) {

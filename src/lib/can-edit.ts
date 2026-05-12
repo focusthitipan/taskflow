@@ -5,18 +5,20 @@ import type { UserRole } from "@/types";
  *
  * Rules:
  * - Admin: always can edit
- * - Member: can edit only if assigned to the task
+ * - Member: can edit if assigned to the task OR created the task
  * - Viewer: never can edit
  */
 export function canEditTask(
   userRole: UserRole | undefined,
   userId: string | undefined,
-  task: { assignees?: Array<{ id: string }> }
+  task: { assignees?: Array<{ id: string }>; createdBy?: string | null }
 ): boolean {
   if (!userRole || !userId) return false;
   if (userRole === "admin") return true;
   if (userRole === "member") {
-    return task.assignees?.some((a) => a.id === userId) ?? false;
+    const isAssignee = task.assignees?.some((a) => a.id === userId) ?? false;
+    const isCreator = task.createdBy === userId;
+    return isAssignee || isCreator;
   }
   return false;
 }

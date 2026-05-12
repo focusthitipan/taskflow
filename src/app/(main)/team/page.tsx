@@ -42,7 +42,6 @@ export default function TeamPage() {
   }
 
   const totalTasks = members.reduce((acc, m) => acc + m.taskCount, 0);
-  const totalCompleted = members.reduce((acc, m) => acc + m.completedTaskCount, 0);
 
   return (
     <div className="space-y-6">

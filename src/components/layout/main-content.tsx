@@ -2,7 +2,7 @@
 
 import { useSidebar } from "./sidebar-context";
 
-export function MainContent({ children }: { children: React.ReactNode }) {
+export function MainContent({ children }: Readonly<{ children: React.ReactNode }>) {
   const { collapsed, isMobile } = useSidebar();
   const sidebarWidth = collapsed ? 72 : 300;
 

@@ -4,6 +4,61 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notifyUsers, notifyOne } from "@/lib/notify";
 
+async function logAndNotifyComment(taskId: string, userId: string, content: string) {
+  const task = await db.task.findUnique({
+    where: { id: taskId },
+    include: { assignees: { include: { user: true } } },
+  });
+
+  if (!task) return;
+
+  await db.activityLog.create({
+    data: {
+      userId,
+      action: "commented on",
+      targetType: "task",
+      targetId: taskId,
+      targetTitle: task.title,
+    },
+  });
+
+  const otherAssigneeIds = task.assignees
+    .map((a) => a.user.id)
+    .filter((uid) => uid !== userId);
+
+  if (otherAssigneeIds.length > 0) {
+    notifyUsers(otherAssigneeIds, "notifCommentMention", {
+      title: "New Comment",
+      message: `New comment on "${task.title}"`,
+      type: "info",
+    });
+  }
+
+  const mentionPattern = /@(\S+)/g;
+  const mentionedNames = [...new Set([...content.matchAll(mentionPattern)].map((m) => m[1]))];
+
+  if (mentionedNames.length > 0) {
+    const mentionedUsers = await db.user.findMany({
+      where: {
+        OR: mentionedNames.map((name) => ({
+          firstName: { contains: name, mode: "insensitive" as const },
+        })),
+      },
+      select: { id: true, firstName: true },
+    });
+
+    for (const mu of mentionedUsers) {
+      if (mu.id !== userId) {
+        notifyOne(mu.id, {
+          title: "You Were Mentioned",
+          message: `You were mentioned in a comment on "${task.title}"`,
+          type: "info",
+        }, "notifCommentMention");
+      }
+    }
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -77,61 +132,8 @@ export async function POST(
       include: { user: true },
     });
 
-    // Also log activity
-    const task = await db.task.findUnique({
-      where: { id },
-      include: { assignees: { include: { user: true } } },
-    });
-
-    if (task) {
-      await db.activityLog.create({
-        data: {
-          userId,
-          action: "commented on",
-          targetType: "task",
-          targetId: id,
-          targetTitle: task.title,
-        },
-      });
-
-      // 🔔 Notify assignees (skip commenter)
-      const otherAssigneeIds = task.assignees
-        .map((a) => a.user.id)
-        .filter((uid) => uid !== userId);
-
-      if (otherAssigneeIds.length > 0) {
-        notifyUsers(otherAssigneeIds, "notifCommentMention", {
-          title: "New Comment",
-          message: `New comment on "${task.title}"`,
-          type: "info",
-        });
-      }
-
-      // 🔔 Check for @mentions in comment content
-      const mentionPattern = /@(\S+)/g;
-      const mentionedNames = [...new Set([...body.content.matchAll(mentionPattern)].map((m: RegExpMatchArray) => m[1]))];
-
-      if (mentionedNames.length > 0) {
-        const mentionedUsers = await db.user.findMany({
-          where: {
-            OR: mentionedNames.map((name) => ({
-              firstName: { contains: name, mode: "insensitive" as const },
-            })),
-          },
-          select: { id: true, firstName: true },
-        });
-
-        for (const mu of mentionedUsers) {
-          if (mu.id !== userId) {
-            notifyOne(mu.id, {
-              title: "You Were Mentioned",
-              message: `You were mentioned in a comment on "${task.title}"`,
-              type: "info",
-            }, "notifCommentMention");
-          }
-        }
-      }
-    }
+    // Also log activity and notify
+    await logAndNotifyComment(id, userId, body.content);
 
     return NextResponse.json(
       {

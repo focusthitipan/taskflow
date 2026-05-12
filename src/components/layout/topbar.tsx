@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Bell, Search, LogOut, User, Settings, ChevronDown, Menu } from "lucide-react";
+import { Bell, Search, LogOut, User, ChevronDown, Menu } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect, useCallback } from "react";
 import { useSidebar } from "./sidebar-context";
@@ -12,6 +12,13 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@/types";
 import { SearchModal } from "./search-modal";
+
+function getNotifDotColor(type: string): string {
+  if (type === "error") return "bg-red-500";
+  if (type === "success") return "bg-green-500";
+  if (type === "warning") return "bg-orange-500";
+  return "bg-brand-500";
+}
 
 export function Topbar() {
   const pathname = usePathname();
@@ -78,7 +85,49 @@ export function Topbar() {
     .toUpperCase()
     .slice(0, 2);
 
-  const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 300;
+  const collapsedWidth = collapsed ? 72 : 300;
+  const sidebarWidth = isMobile ? 0 : collapsedWidth;
+
+  function renderNotifList() {
+    if (notifLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-5 h-5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
+        </div>
+      );
+    }
+    if (notifications.length === 0) {
+      return (
+        <p className="text-sm text-secondaryGray-600 text-center py-8">
+          {t.topbar.noNotifications}
+        </p>
+      );
+    }
+    return notifications.map((n) => (
+      <button
+        key={n.id}
+        onClick={() => markRead(n.id)}
+        className={cn(
+          "w-full text-left px-4 sm:px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150",
+          !n.read && "bg-brand-100/30 dark:bg-brand-900/20"
+        )}
+      >
+        <div className="flex items-start gap-3">
+          <div className={cn("w-2 h-2 rounded-full mt-1.5 flex-shrink-0", getNotifDotColor(n.type))} />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{n.title}</p>
+            <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{n.message}</p>
+            <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">
+              {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+            </p>
+          </div>
+          {!n.read && (
+            <div className="w-2 h-2 rounded-full bg-brand-500 flex-shrink-0 mt-1.5" />
+          )}
+        </div>
+      </button>
+    ));
+  }
 
   const dateLocale = locale === "th" ? "th-TH" : "en-US";
 
@@ -177,8 +226,10 @@ export function Topbar() {
 
             {notifOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
+                <button
+                  type="button"
+                  aria-label="Close notifications"
+                  className="fixed inset-0 z-40 cursor-default border-0 bg-transparent p-0"
                   onClick={() => setNotifOpen(false)}
                 />
                 <div className="absolute right-0 top-12 z-50 w-[300px] sm:w-[340px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
@@ -201,55 +252,7 @@ export function Topbar() {
                     )}
                   </div>
                   <div className="max-h-[280px] sm:max-h-[300px] overflow-y-auto custom-scrollbar">
-                    {notifLoading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <div className="w-5 h-5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
-                      </div>
-                    ) : notifications.length === 0 ? (
-                      <p className="text-sm text-secondaryGray-600 text-center py-8">
-                        {t.topbar.noNotifications}
-                      </p>
-                    ) : (
-                      notifications.map((n) => (
-                        <button
-                          key={n.id}
-                          onClick={() => markRead(n.id)}
-                          className={cn(
-                            "w-full text-left px-4 sm:px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150",
-                            !n.read && "bg-brand-100/30 dark:bg-brand-900/20"
-                          )}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div
-                              className={cn(
-                                "w-2 h-2 rounded-full mt-1.5 flex-shrink-0",
-                                n.type === "error"
-                                  ? "bg-red-500"
-                                  : n.type === "success"
-                                    ? "bg-green-500"
-                                    : n.type === "warning"
-                                      ? "bg-orange-500"
-                                      : "bg-brand-500"
-                              )}
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
-                                {n.title}
-                              </p>
-                              <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">
-                                {n.message}
-                              </p>
-                              <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">
-                                {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                              </p>
-                            </div>
-                            {!n.read && (
-                              <div className="w-2 h-2 rounded-full bg-brand-500 flex-shrink-0 mt-1.5" />
-                            )}
-                          </div>
-                        </button>
-                      ))
-                    )}
+                    {renderNotifList()}
                   </div>
                 </div>
               </>
@@ -282,8 +285,10 @@ export function Topbar() {
 
             {avatarOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
+                <button
+                  type="button"
+                  aria-label="Close menu"
+                  className="fixed inset-0 z-40 cursor-default border-0 bg-transparent p-0"
                   onClick={() => setAvatarOpen(false)}
                 />
                 <div className="absolute right-0 top-12 z-50 w-[180px] sm:w-[200px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden py-2">
@@ -296,7 +301,7 @@ export function Topbar() {
                   <button
                     onClick={() => {
                       setAvatarOpen(false);
-                      window.location.href = "/settings";
+                      globalThis.location.href = "/settings";
                     }}
                     className="flex items-center gap-3 w-full px-4 py-3 text-sm text-secondaryGray-900 dark:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
                   >

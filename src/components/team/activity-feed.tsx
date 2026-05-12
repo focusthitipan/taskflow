@@ -13,7 +13,7 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 interface ActivityFeedProps {
-  activity: ActivityLog[];
+  readonly activity: ActivityLog[];
 }
 
 export function ActivityFeed({ activity }: ActivityFeedProps) {

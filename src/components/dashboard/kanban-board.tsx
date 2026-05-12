@@ -23,7 +23,7 @@ import { canEditTask } from "@/lib/can-edit";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-function SortableTaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
+function SortableTaskCard({ task, onClick }: Readonly<{ task: Task; onClick: () => void }>) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: { type: "task", task },
@@ -51,7 +51,7 @@ function DroppableColumn({
   dropText,
   currentUserRole,
   currentUserId,
-}: {
+}: Readonly<{
   column: { id: TaskStatus; label: string; dotColor: string };
   tasks: Task[];
   onTaskClick: (task: Task) => void;
@@ -59,7 +59,7 @@ function DroppableColumn({
   dropText: string;
   currentUserRole?: UserRole;
   currentUserId?: string;
-}) {
+}>) {
   const { setNodeRef } = useDroppable({ id: column.id });
 
   return (
@@ -107,10 +107,10 @@ function DroppableColumn({
 }
 
 interface KanbanBoardProps {
-  tasks: Task[];
-  onTasksChange: (tasks: Task[]) => void;
-  currentUserRole?: UserRole;
-  currentUserId?: string;
+  readonly tasks: Task[];
+  readonly onTasksChange: (tasks: Task[]) => void;
+  readonly currentUserRole?: UserRole;
+  readonly currentUserId?: string;
 }
 
 export function KanbanBoard({ tasks, onTasksChange, currentUserRole, currentUserId }: KanbanBoardProps) {

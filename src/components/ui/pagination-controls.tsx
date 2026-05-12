@@ -5,10 +5,10 @@ import { useT } from "@/components/layout/i18n-provider";
 import { cn } from "@/lib/utils";
 
 interface PaginationControlsProps {
-  page: number;
-  totalPages: number;
-  total: number;
-  onPageChange: (page: number) => void;
+  readonly page: number;
+  readonly totalPages: number;
+  readonly total: number;
+  readonly onPageChange: (page: number) => void;
 }
 
 export function PaginationControls({ page, totalPages, total, onPageChange }: PaginationControlsProps) {
@@ -45,7 +45,7 @@ export function PaginationControls({ page, totalPages, total, onPageChange }: Pa
 
         {pages.map((p, i) =>
           p === "..." ? (
-            <span key={`dot-${i}`} className="w-9 h-9 flex items-center justify-center text-xs text-secondaryGray-600">
+            <span key={`ellipsis-before-${pages[i + 1] ?? "end"}`} className="w-9 h-9 flex items-center justify-center text-xs text-secondaryGray-600">
               ...
             </span>
           ) : (

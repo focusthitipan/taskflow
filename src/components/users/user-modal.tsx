@@ -15,10 +15,10 @@ const AVATAR_COLORS = [
 ];
 
 interface UserModalProps {
-  mode: "add" | "edit";
-  user?: User;
-  onClose: () => void;
-  onSaved: (user: User) => void;
+  readonly mode: "add" | "edit";
+  readonly user?: User;
+  readonly onClose: () => void;
+  readonly onSaved: (user: User) => void;
 }
 
 export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
@@ -91,7 +91,12 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-default border-0 p-0"
+        onClick={onClose}
+      />
       <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-md card-shadow overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
           <h2 className="text-xl font-bold text-secondaryGray-900 dark:text-white">
@@ -205,7 +210,10 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
               disabled={isSubmitting}
               className="flex-1 h-[44px] rounded-full text-sm font-bold text-white gradient-brand disabled:opacity-60"
             >
-              {isSubmitting ? t.users.saving : mode === "add" ? t.users.addUser : t.users.saveChanges}
+              {(() => {
+                if (isSubmitting) return t.users.saving;
+                return mode === "add" ? t.users.addUser : t.users.saveChanges;
+              })()}
             </button>
           </div>
         </form>

@@ -268,9 +268,9 @@ function ProfileTab() {
 
       {/* Avatar Color */}
       <div>
-        <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-3">
+        <p className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-3">
           Avatar Color
-        </label>
+        </p>
         <div className="flex flex-wrap gap-3">
           {AVATAR_COLORS.map((color) => (
             <button

@@ -9,8 +9,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId") || "";
   const action = searchParams.get("action") || "";
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "15", 10)));
+  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.max(1, Math.min(50, Number.parseInt(searchParams.get("limit") || "15", 10)));
 
   try {
     const where: Record<string, unknown> = {};

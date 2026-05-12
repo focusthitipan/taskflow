@@ -26,11 +26,26 @@ const PRIORITY_COLORS = {
   low: "bg-green-500",
 };
 
+function TaskChip({ task, onSelect }: Readonly<{ task: Task; onSelect: (t: Task) => void }>) {
+  return (
+    <button
+      key={task.id}
+      onClick={() => onSelect(task)}
+      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] bg-secondaryGray-300 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-600 transition-colors duration-150 w-full text-left cursor-pointer"
+    >
+      <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", PRIORITY_COLORS[task.priority])} />
+      <span className="text-[9px] font-medium text-secondaryGray-900 dark:text-white truncate">
+        {task.title}
+      </span>
+    </button>
+  );
+}
+
 interface CalendarViewProps {
-  tasks: Task[];
-  onTasksChange: (tasks: Task[]) => void;
-  currentUserRole?: UserRole;
-  currentUserId?: string;
+  readonly tasks: Task[];
+  readonly onTasksChange: (tasks: Task[]) => void;
+  readonly currentUserRole?: UserRole;
+  readonly currentUserId?: string;
 }
 
 export function CalendarView({ tasks, onTasksChange, currentUserRole, currentUserId }: CalendarViewProps) {
@@ -111,19 +126,19 @@ export function CalendarView({ tasks, onTasksChange, currentUserRole, currentUse
       </div>
 
       {/* Calendar grid */}
-      {rows.map((row, rowIdx) => (
+      {rows.map((row) => (
         <div
-          key={rowIdx}
+          key={format(row[0], "yyyy-MM-dd")}
           className="grid grid-cols-7 border-b border-secondaryGray-100 dark:border-white/10 last:border-0"
         >
-          {row.map((day, dayIdx) => {
+          {row.map((day) => {
             const dayTasks = getTasksForDay(day);
             const isToday = isSameDay(day, new Date());
             const isCurrentMonth = isSameMonth(day, currentDate);
 
             return (
               <div
-                key={dayIdx}
+                key={format(day, "yyyy-MM-dd")}
                 className={cn(
                   "min-h-[100px] p-2 border-r border-secondaryGray-100 dark:border-white/10 last:border-0",
                   !isCurrentMonth && "opacity-40"
@@ -141,21 +156,7 @@ export function CalendarView({ tasks, onTasksChange, currentUserRole, currentUse
                 </div>
                 <div className="space-y-1">
                   {dayTasks.slice(0, 3).map((task) => (
-                    <button
-                      key={task.id}
-                      onClick={() => setSelectedTask(task)}
-                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] bg-secondaryGray-300 dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-600 transition-colors duration-150 w-full text-left cursor-pointer"
-                    >
-                      <div
-                        className={cn(
-                          "w-1.5 h-1.5 rounded-full flex-shrink-0",
-                          PRIORITY_COLORS[task.priority]
-                        )}
-                      />
-                      <span className="text-[9px] font-medium text-secondaryGray-900 dark:text-white truncate">
-                        {task.title}
-                      </span>
-                    </button>
+                    <TaskChip key={task.id} task={task} onSelect={setSelectedTask} />
                   ))}
                   {dayTasks.length > 3 && (
                     <p className="text-[9px] text-secondaryGray-600 font-normal pl-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 
 interface WorkspaceSettings {
   name: string;
@@ -25,7 +25,7 @@ const WorkspaceContext = createContext<WorkspaceContextValue>({
   refresh: async () => {},
 });
 
-export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
+export function WorkspaceProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [settings, setSettings] = useState<WorkspaceSettings>({
     name: "",
     defaultPriority: "medium",
@@ -64,8 +64,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       : "TaskFlow — Team Task Management";
   }, [settings.name]);
 
+  const contextValue = useMemo(() => ({ ...settings, refresh }), [settings, refresh]);
+
   return (
-    <WorkspaceContext.Provider value={{ ...settings, refresh }}>
+    <WorkspaceContext.Provider value={contextValue}>
       {children}
     </WorkspaceContext.Provider>
   );

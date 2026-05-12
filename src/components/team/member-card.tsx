@@ -5,7 +5,7 @@ import type { TeamMember } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface MemberCardProps {
-  member: TeamMember;
+  readonly member: TeamMember;
 }
 
 export function MemberCard({ member }: MemberCardProps) {

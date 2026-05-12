@@ -32,8 +32,8 @@ export async function GET(request: Request) {
   const search = searchParams.get("search") || "";
   const role = searchParams.get("role") || "all";
   const status = searchParams.get("status") || "all";
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "10", 10)));
+  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.max(1, Math.min(50, Number.parseInt(searchParams.get("limit") || "10", 10)));
   const sortBy = (VALID_SORT_BY.includes(searchParams.get("sort_by") as SortBy) ? searchParams.get("sort_by") : "createdAt") as SortBy;
   const sortDir = searchParams.get("sort_dir") === "asc" ? "asc" : "desc";
 
@@ -48,8 +48,8 @@ export async function GET(request: Request) {
             ],
           }
         : {},
-      role !== "all" ? { role: role as UserRole } : {},
-      status !== "all" ? { status: status as UserStatus } : {},
+      role === "all" ? {} : { role: role as UserRole },
+      status === "all" ? {} : { status: status as UserStatus },
     ],
   };
 

@@ -68,15 +68,18 @@ export default function MyTasksPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading && (
         <div className="stagger stagger-3 flex items-center justify-center py-20">
           <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
         </div>
-      ) : view === "kanban" ? (
+      )}
+      {!loading && view === "kanban" && (
         <KanbanBoard tasks={tasks} onTasksChange={setTasks} currentUserRole={userRole} currentUserId={userId} />
-      ) : view === "list" ? (
+      )}
+      {!loading && view === "list" && (
         <ListView tasks={tasks} onTasksChange={setTasks} currentUserRole={userRole} currentUserId={userId} />
-      ) : (
+      )}
+      {!loading && view !== "kanban" && view !== "list" && (
         <CalendarView tasks={tasks} onTasksChange={setTasks} currentUserRole={userRole} currentUserId={userId} />
       )}
     </div>

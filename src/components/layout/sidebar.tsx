@@ -19,6 +19,58 @@ import { useT } from "./i18n-provider";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "./workspace-context";
 
+function NavItem({
+  href,
+  label,
+  icon: Icon,
+  isActive,
+  collapsed,
+  isMobile,
+  setMobileOpen,
+}: Readonly<{
+  href: string;
+  label: string;
+  icon: React.ElementType;
+  isActive: boolean;
+  collapsed: boolean;
+  isMobile: boolean;
+  setMobileOpen: (open: boolean) => void;
+}>) {
+  return (
+    <Link
+      href={href}
+      onClick={() => isMobile && setMobileOpen(false)}
+      className={cn(
+        "flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-150 relative group w-full",
+        isActive
+          ? "text-secondaryGray-900 dark:text-white"
+          : "text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white"
+      )}
+    >
+      <Icon
+        className={cn(
+          "w-5 h-5 flex-shrink-0 transition-colors duration-150",
+          isActive ? "text-brand-500 dark:text-white" : "text-secondaryGray-600"
+        )}
+      />
+      {(!collapsed || isMobile) && (
+        <span
+          className={cn(
+            "text-sm transition-all duration-150",
+            isActive ? "font-bold" : "font-normal"
+          )}
+        >
+          {label}
+        </span>
+      )}
+      {/* Active indicator bar */}
+      {isActive && (
+        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-9 rounded-[5px] bg-brand-500 dark:bg-brand-400 animate-[indicator-pop_200ms_ease_both]" />
+      )}
+    </Link>
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -42,59 +94,17 @@ export function Sidebar() {
     { href: "/settings", label: t.nav.settings, icon: Settings },
   ];
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const checkActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
-  const NavItem = ({
-    href,
-    label,
-    icon: Icon,
-  }: {
-    href: string;
-    label: string;
-    icon: React.ElementType;
-  }) => {
-    const active = isActive(href);
-    return (
-      <Link
-        href={href}
-        onClick={() => isMobile && setMobileOpen(false)}
-        className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-150 relative group w-full",
-          active
-            ? "text-secondaryGray-900 dark:text-white"
-            : "text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white"
-        )}
-      >
-        <Icon
-          className={cn(
-            "w-5 h-5 flex-shrink-0 transition-colors duration-150",
-            active ? "text-brand-500 dark:text-white" : "text-secondaryGray-600"
-          )}
-        />
-        {(!collapsed || isMobile) && (
-          <span
-            className={cn(
-              "text-sm transition-all duration-150",
-              active ? "font-bold" : "font-normal"
-            )}
-          >
-            {label}
-          </span>
-        )}
-        {/* Active indicator bar */}
-        {active && (
-          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-9 rounded-[5px] bg-brand-500 dark:bg-brand-400 animate-[indicator-pop_200ms_ease_both]" />
-        )}
-      </Link>
-    );
-  };
+  const desktopWidth = collapsed ? "w-[72px]" : "w-[300px]";
+  const sidebarWidth = isMobile ? "w-[285px]" : desktopWidth;
 
   const sidebarContent = (
     <div
       className={cn(
         "h-full bg-white dark:bg-navy-800 flex flex-col overflow-hidden",
         "shadow-[14px_17px_40px_4px_rgba(112,144,176,0.08)]",
-        isMobile ? "w-[285px]" : collapsed ? "w-[72px]" : "w-[300px]"
+        sidebarWidth
       )}
     >
       {/* Logo */}
@@ -115,7 +125,7 @@ export function Sidebar() {
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
         {NAV_ITEMS.map((item, i) => (
           <div key={item.href} className={cn("nav-item", `nav-item-${i + 1}`)}>
-            <NavItem {...item} />
+            <NavItem {...item} isActive={checkActive(item.href)} collapsed={collapsed} isMobile={isMobile} setMobileOpen={setMobileOpen} />
           </div>
         ))}
 
@@ -128,7 +138,7 @@ export function Sidebar() {
             )}
             {ADMIN_ITEMS.map((item, i) => (
               <div key={item.href} className={cn("nav-item", `nav-item-${NAV_ITEMS.length + i + 2}`)}>
-                <NavItem {...item} />
+                <NavItem {...item} isActive={checkActive(item.href)} collapsed={collapsed} isMobile={isMobile} setMobileOpen={setMobileOpen} />
               </div>
             ))}
           </>
@@ -139,7 +149,7 @@ export function Sidebar() {
       <div className="px-3 pb-4 space-y-1 flex-shrink-0">
         {BOTTOM_ITEMS.map((item, i) => (
           <div key={item.href} className={cn("nav-item", `nav-item-${NAV_ITEMS.length + ADMIN_ITEMS.length + i + 2}`)}>
-            <NavItem {...item} />
+            <NavItem {...item} isActive={checkActive(item.href)} collapsed={collapsed} isMobile={isMobile} setMobileOpen={setMobileOpen} />
           </div>
         ))}
 
@@ -168,9 +178,11 @@ export function Sidebar() {
     return (
       <>
         {/* Backdrop */}
-        <div
+        <button
+          type="button"
+          aria-label="Close sidebar"
           className={cn(
-            "fixed inset-0 bg-black/40 z-40 transition-opacity duration-300",
+            "fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 cursor-default border-0 p-0",
             mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
           onClick={() => setMobileOpen(false)}

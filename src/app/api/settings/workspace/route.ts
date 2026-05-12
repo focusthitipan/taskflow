@@ -9,18 +9,16 @@ export async function GET() {
   try {
     let workspace = await db.workspaceSetting.findFirst();
 
-    if (!workspace) {
-      workspace = await db.workspaceSetting.create({
-        data: {
-          name: "TaskFlow Workspace",
-          defaultPriority: "medium",
-          tags: ["Design", "Backend", "Frontend", "DevOps", "Research", "Bug", "Feature"],
-          workingDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          businessHoursStart: "09:00",
-          businessHoursEnd: "18:00",
-        },
-      });
-    }
+    workspace ??= await db.workspaceSetting.create({
+      data: {
+        name: "TaskFlow Workspace",
+        defaultPriority: "medium",
+        tags: ["Design", "Backend", "Frontend", "DevOps", "Research", "Bug", "Feature"],
+        workingDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        businessHoursStart: "09:00",
+        businessHoursEnd: "18:00",
+      },
+    });
 
     return NextResponse.json({
       workspace: {

@@ -60,6 +60,22 @@ const includeShape = {
  * - Member: allowed only if assigned to the task
  * - Viewer: never allowed
  */
+function notifyStatusChange(
+  oldTask: { title: string; status: string; assignees: Array<{ user: { id: string } }>; createdById: string | null } | null,
+  newStatus: string | undefined
+) {
+  if (!oldTask || !newStatus || newStatus === oldTask.status) return;
+  const assigneeIds = oldTask.assignees.map((a) => a.user.id);
+  const allInvolved = [...new Set([...assigneeIds, ...(oldTask.createdById ? [oldTask.createdById] : [])])];
+  if (allInvolved.length > 0) {
+    notifyUsers(allInvolved, "notifTeamActivity", {
+      title: "Task Status Updated",
+      message: `"${oldTask.title}" moved from ${oldTask.status.replace("_", " ")} to ${newStatus.replace("_", " ")}`,
+      type: newStatus === "done" ? "success" : "info",
+    });
+  }
+}
+
 async function authorizeWrite(taskId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return { authorized: false, status: 401, userId: null, role: null };
@@ -96,6 +112,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!task) return NextResponse.json({ error: "Task not found" }, { status: 404 });
     return NextResponse.json({ task: mapTask(task as Parameters<typeof mapTask>[0]) });
   } catch (error) {
+    console.error("GET /api/tasks/[id] error:", error);
     return NextResponse.json({ error: "Failed to fetch task" }, { status: 500 });
   }
 }
@@ -129,7 +146,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         project: body.project,
         tags: body.tags,
         dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
-        progress: body.progress !== undefined ? Number(body.progress) : undefined,
+        progress: body.progress === undefined ? undefined : Number(body.progress),
       },
       include: includeShape,
     });
@@ -150,6 +167,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     return NextResponse.json({ task: mapTask(task as Parameters<typeof mapTask>[0]) });
   } catch (error) {
+    console.error("PUT /api/tasks/[id] error:", error);
     return NextResponse.json({ error: "Failed to update task" }, { status: 500 });
   }
 }
@@ -183,22 +201,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       include: includeShape,
     });
 
-    if (oldTask && body.status && body.status !== oldTask.status) {
-      const assigneeIds = oldTask.assignees.map((a) => a.user.id);
-      const creatorId = oldTask.createdById;
-      const allInvolved = [...new Set([...assigneeIds, ...(creatorId ? [creatorId] : [])])];
-
-      if (allInvolved.length > 0) {
-        notifyUsers(allInvolved, "notifTeamActivity", {
-          title: "Task Status Updated",
-          message: `"${oldTask.title}" moved from ${oldTask.status.replace("_", " ")} to ${(body.status as string).replace("_", " ")}`,
-          type: body.status === "done" ? "success" : "info",
-        });
-      }
-    }
+    notifyStatusChange(oldTask, body.status as string | undefined);
 
     return NextResponse.json({ task: mapTask(task as Parameters<typeof mapTask>[0]) });
   } catch (error) {
+    console.error("PATCH /api/tasks/[id] error:", error);
     return NextResponse.json({ error: "Failed to patch task" }, { status: 500 });
   }
 }
@@ -218,6 +225,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     await db.task.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("DELETE /api/tasks/[id] error:", error);
     return NextResponse.json({ error: "Failed to delete task" }, { status: 500 });
   }
 }

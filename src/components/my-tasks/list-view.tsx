@@ -10,10 +10,10 @@ import { toast } from "sonner";
 import { TaskDetailModal } from "@/components/dashboard/task-detail-modal";
 
 interface ListViewProps {
-  tasks: Task[];
-  onTasksChange: (tasks: Task[]) => void;
-  currentUserRole?: UserRole;
-  currentUserId?: string;
+  readonly tasks: Task[];
+  readonly onTasksChange: (tasks: Task[]) => void;
+  readonly currentUserRole?: UserRole;
+  readonly currentUserId?: string;
 }
 
 export function ListView({ tasks, onTasksChange, currentUserRole, currentUserId }: ListViewProps) {
@@ -137,6 +137,7 @@ export function ListView({ tasks, onTasksChange, currentUserRole, currentUserId 
                     value={task.status}
                     disabled={updating === task.id || !canEditTask(currentUserRole, currentUserId, task)}
                     onChange={(e) => updateStatus(task.id, e.target.value as TaskStatus)}
+                    onClick={(e) => e.stopPropagation()}
                     className="text-xs font-medium rounded-[10px] px-2 py-1 bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-900 dark:text-white border-none disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="todo">{t.dashboard.toDo}</option>
@@ -152,7 +153,7 @@ export function ListView({ tasks, onTasksChange, currentUserRole, currentUserId 
                         isOverdue ? "text-red-500" : "text-secondaryGray-600"
                       )}
                     >
-                      {isOverdue ? `${Math.abs(daysLeft!)}${t.dashboard.daysOverdue}` : `${daysLeft}${t.dashboard.daysLeft}`}
+                      {isOverdue ? `${Math.abs(daysLeft ?? 0)}${t.dashboard.daysOverdue}` : `${daysLeft}${t.dashboard.daysLeft}`}
                     </span>
                   ) : (
                     <span className="text-xs text-secondaryGray-600">{t.common.none}</span>

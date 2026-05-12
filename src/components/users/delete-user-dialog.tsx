@@ -7,9 +7,9 @@ import type { User } from "@/types";
 import { toast } from "sonner";
 
 interface DeleteUserDialogProps {
-  user: User;
-  onClose: () => void;
-  onDeleted: (userId: string) => void;
+  readonly user: User;
+  readonly onClose: () => void;
+  readonly onDeleted: (userId: string) => void;
 }
 
 export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogProps) {
@@ -32,7 +32,12 @@ export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-default border-0 p-0"
+        onClick={onClose}
+      />
       <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-sm card-shadow p-6">
         <button
           onClick={onClose}

@@ -5,7 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
-  useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import type { Locale, Translations } from "@/lib/i18n/types";
@@ -28,29 +28,27 @@ const I18nContext = createContext<I18nContextValue>({
   t: en,
 });
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
-  const [mounted, setMounted] = useState(false);
+export function I18nProvider({ children }: Readonly<{ children: ReactNode }>) {
+  const [locale, setLocale] = useState<Locale>("en");
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
     if (stored && (stored === "en" || stored === "th")) {
-      setLocaleState(stored);
+      setLocale(stored);
     }
-    setMounted(true);
   }, []);
 
-  const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
-    localStorage.setItem(STORAGE_KEY, newLocale);
-    document.documentElement.lang = newLocale;
-  }, []);
+  // Sync locale changes to storage and html lang attribute
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, locale);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
-  const value: I18nContextValue = {
+  const value = useMemo<I18nContextValue>(() => ({
     locale,
     setLocale,
     t: dictionaries[locale],
-  };
+  }), [locale, setLocale]);
 
   return (
     <I18nContext.Provider value={value}>

@@ -7,7 +7,7 @@ import { PageTransition } from "@/components/layout/page-transition";
 import { ProfileProvider } from "@/components/layout/profile-context";
 import { WorkspaceProvider } from "@/components/layout/workspace-context";
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function MainLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <SessionProvider>
       <ProfileProvider>

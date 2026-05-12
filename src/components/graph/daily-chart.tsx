@@ -13,8 +13,8 @@ import {
 import type { GraphDataPoint } from "@/types";
 
 interface DailyChartProps {
-  data: GraphDataPoint[];
-  id?: string;
+  readonly data: GraphDataPoint[];
+  readonly id?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string }>; label?: string }) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 type AccentId = "violet" | "mint" | "amber" | "coral" | "royal-blue" | "purple";
 
@@ -127,8 +127,8 @@ function applyPalette(palette: AccentPalette) {
   root.style.setProperty("--brand-900", palette.hsl[900]);
 }
 
-export function AccentProvider({ children }: { children: React.ReactNode }) {
-  const [accent, setAccentState] = useState<AccentId>("coral");
+export function AccentProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+  const [accent, setAccent] = useState<AccentId>("coral");
   const [hydrated, setHydrated] = useState(false);
 
   // Hydrate from localStorage on mount
@@ -138,7 +138,7 @@ export function AccentProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored) as AccentId;
         if (ACCENT_PALETTES.some((p) => p.id === parsed)) {
-          setAccentState(parsed);
+          setAccent(parsed);
         }
       }
     } catch {
@@ -150,23 +150,26 @@ export function AccentProvider({ children }: { children: React.ReactNode }) {
   // Apply CSS variables when accent changes
   useEffect(() => {
     if (!hydrated) return;
-    const palette = ACCENT_PALETTES.find((p) => p.id === accent) ?? ACCENT_PALETTES[0]!;
-    applyPalette(palette);
+    const palette = ACCENT_PALETTES.find((p) => p.id === accent) ?? ACCENT_PALETTES[0];
+    if (palette) applyPalette(palette);
   }, [accent, hydrated]);
 
-  const setAccent = useCallback((id: AccentId) => {
-    setAccentState(id);
+  // Persist to localStorage when accent changes (after hydration)
+  useEffect(() => {
+    if (!hydrated) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(id));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(accent));
     } catch {
       // ignore
     }
-  }, []);
+  }, [accent, hydrated]);
 
-  const palette = ACCENT_PALETTES.find((p) => p.id === accent) ?? ACCENT_PALETTES[0]!;
+  const palette = ACCENT_PALETTES.find((p) => p.id === accent) ?? ACCENT_PALETTES[0];
+
+  const contextValue = useMemo(() => ({ accent, setAccent, palette }), [accent, setAccent, palette]);
 
   return (
-    <AccentContext.Provider value={{ accent, setAccent, palette }}>
+    <AccentContext.Provider value={contextValue}>
       {children}
     </AccentContext.Provider>
   );

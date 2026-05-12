@@ -12,8 +12,8 @@ import type { Task, User } from "@/types";
 import { toast } from "sonner";
 
 interface NewTaskModalProps {
-  onClose: () => void;
-  onCreated: (task: Task) => void;
+  readonly onClose: () => void;
+  readonly onCreated: (task: Task) => void;
 }
 
 export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
@@ -88,7 +88,12 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-default border-0 p-0"
+        onClick={onClose}
+      />
       <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-xl card-shadow overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">

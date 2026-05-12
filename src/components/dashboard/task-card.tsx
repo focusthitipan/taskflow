@@ -9,35 +9,45 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn, remainingWorkDays } from "@/lib/utils";
 
 interface TaskCardProps {
-  task: Task;
-  onClick: () => void;
-  isDragging?: boolean;
+  readonly task: Task;
+  readonly onClick: () => void;
+  readonly isDragging?: boolean;
 }
 
-function DueDateBadge({ dueDate }: { dueDate: string }) {
+function DueDateBadge({ dueDate }: { readonly dueDate: string }) {
   const { t } = useT();
   const { workingDays } = useWorkspace();
   const days = remainingWorkDays(parseISO(dueDate), workingDays);
   const isOverdue = days < 0;
   const isUrgent = days >= 0 && days <= 2;
 
+  let badgeClass: string;
+  if (isOverdue) {
+    badgeClass = "bg-red-100 text-red-500 dark:bg-red-500/20";
+  } else if (isUrgent) {
+    badgeClass = "bg-orange-100 text-orange-500 dark:bg-orange-500/20";
+  } else {
+    badgeClass = "bg-green-100 text-green-500 dark:bg-green-500/20";
+  }
+
+  let badgeLabel: string;
+  if (isOverdue) {
+    badgeLabel = `${Math.abs(days)}${t.dashboard.workDaysOverdue}`;
+  } else if (days === 0) {
+    badgeLabel = t.common.today;
+  } else {
+    badgeLabel = `${days}${t.dashboard.workDaysLeft}`;
+  }
+
   return (
     <span
       className={cn(
         "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-[10px]",
-        isOverdue
-          ? "bg-red-100 text-red-500 dark:bg-red-500/20"
-          : isUrgent
-            ? "bg-orange-100 text-orange-500 dark:bg-orange-500/20"
-            : "bg-green-100 text-green-500 dark:bg-green-500/20"
+        badgeClass
       )}
     >
       <Calendar className="w-3 h-3" />
-      {isOverdue
-        ? `${Math.abs(days)}${t.dashboard.workDaysOverdue}`
-        : days === 0
-          ? t.common.today
-          : `${days}${t.dashboard.workDaysLeft}`}
+      {badgeLabel}
     </span>
   );
 }
@@ -59,10 +69,11 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
   const extraCount = assignees.length - maxAvatars;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
       className={cn(
-        "bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow cursor-pointer",
+        "w-full text-left bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow cursor-pointer",
         "hover:shadow-[14px_17px_50px_4px_rgba(112,144,176,0.15)] transition-all duration-250 ease",
         isDragging && "opacity-50 rotate-2"
       )}
@@ -162,6 +173,6 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
           {task.dueDate && <DueDateBadge dueDate={task.dueDate} />}
         </div>
       </div>
-    </div>
+    </button>
   );
 }

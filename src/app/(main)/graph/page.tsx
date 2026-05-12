@@ -181,11 +181,12 @@ export default function GraphPage() {
 
         {/* Chart */}
         <div ref={chartRef}>
-          {loading ? (
+          {loading && (
             <div className="h-[420px] flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
             </div>
-          ) : filteredData.length === 0 ? (
+          )}
+          {!loading && filteredData.length === 0 && (
             <div className="h-[420px] flex flex-col items-center justify-center text-center px-5">
               <div className="w-12 h-12 rounded-full bg-secondaryGray-300 dark:bg-navy-700 flex items-center justify-center mb-4">
                 <CalendarDays className="w-6 h-6 text-secondaryGray-500" />
@@ -197,7 +198,8 @@ export default function GraphPage() {
                 No tasks, comments, or activity were recorded on this date. Try selecting a different day.
               </p>
             </div>
-          ) : (
+          )}
+          {!loading && filteredData.length > 0 && (
             <DailyChart data={filteredData} id="daily-chart" />
           )}
         </div>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
 
 interface WorkloadOverviewProps {
-  members: TeamMember[];
+  readonly members: TeamMember[];
 }
 
 export function WorkloadOverview({ members }: WorkloadOverviewProps) {

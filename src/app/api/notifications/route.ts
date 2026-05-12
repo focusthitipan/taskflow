@@ -45,7 +45,7 @@ export async function PATCH(request: Request) {
     } else if (body.id) {
       // Verify the notification belongs to the user
       const notif = await db.notification.findUnique({ where: { id: body.id } });
-      if (!notif || notif.userId !== auth.userId) {
+      if (notif?.userId !== auth.userId) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       await db.notification.update({

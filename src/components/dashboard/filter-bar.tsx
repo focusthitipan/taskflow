@@ -5,8 +5,8 @@ import { useT } from "@/components/layout/i18n-provider";
 import type { TaskFilters } from "@/types";
 
 interface FilterBarProps {
-  filters: TaskFilters;
-  onFiltersChange: (filters: TaskFilters) => void;
+  readonly filters: TaskFilters;
+  readonly onFiltersChange: (filters: TaskFilters) => void;
 }
 
 export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {

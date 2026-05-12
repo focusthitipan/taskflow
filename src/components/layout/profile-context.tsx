@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 
 interface ProfileContextValue {
@@ -17,7 +17,7 @@ const ProfileContext = createContext<ProfileContextValue>({
   refreshProfile: async () => {},
 });
 
-export function ProfileProvider({ children }: { children: React.ReactNode }) {
+export function ProfileProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const { data: session } = useSession();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarColor, setAvatarColor] = useState<string | null>(null);
@@ -43,8 +43,10 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     }
   }, [session?.user, refreshProfile]);
 
+  const contextValue = useMemo(() => ({ avatarUrl, avatarColor, displayName, refreshProfile }), [avatarUrl, avatarColor, displayName, refreshProfile]);
+
   return (
-    <ProfileContext.Provider value={{ avatarUrl, avatarColor, displayName, refreshProfile }}>
+    <ProfileContext.Provider value={contextValue}>
       {children}
     </ProfileContext.Provider>
   );

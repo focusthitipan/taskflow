@@ -13,14 +13,29 @@ interface PaginationMeta {
 }
 
 interface UsersTableProps {
-  users: User[];
-  pagination: PaginationMeta;
-  sortBy: string;
-  sortDir: string;
-  onPageChange: (page: number) => void;
-  onSortChange: (sortBy: string) => void;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
+  readonly users: User[];
+  readonly pagination: PaginationMeta;
+  readonly sortBy: string;
+  readonly sortDir: string;
+  readonly onPageChange: (page: number) => void;
+  readonly onSortChange: (sortBy: string) => void;
+  readonly onEdit: (user: User) => void;
+  readonly onDelete: (user: User) => void;
+}
+
+interface SortIconProps {
+  readonly column: string;
+  readonly sortBy: string;
+  readonly sortDir: string;
+}
+
+function SortIcon({ column, sortBy, sortDir }: SortIconProps) {
+  if (sortBy !== column) return null;
+  return sortDir === "asc" ? (
+    <ArrowUp className="w-3 h-3 inline ml-1" />
+  ) : (
+    <ArrowDown className="w-3 h-3 inline ml-1" />
+  );
 }
 
 export function UsersTable({
@@ -56,15 +71,6 @@ export function UsersTable({
     onSortChange(key);
   };
 
-  const SortIcon = ({ column }: { column: string }) => {
-    if (sortBy !== column) return null;
-    return sortDir === "asc" ? (
-      <ArrowUp className="w-3 h-3 inline ml-1" />
-    ) : (
-      <ArrowDown className="w-3 h-3 inline ml-1" />
-    );
-  };
-
   return (
     <div className="space-y-4">
       {/* Table */}
@@ -78,7 +84,7 @@ export function UsersTable({
                     onClick={() => handleSort("name")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    {t.users.user}<SortIcon column="name" />
+                    {t.users.user}<SortIcon column="name" sortBy={sortBy} sortDir={sortDir} />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden md:table-cell">
@@ -86,7 +92,7 @@ export function UsersTable({
                     onClick={() => handleSort("email")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    {t.users.email}<SortIcon column="email" />
+                    {t.users.email}<SortIcon column="email" sortBy={sortBy} sortDir={sortDir} />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
@@ -94,7 +100,7 @@ export function UsersTable({
                     onClick={() => handleSort("role")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    {t.users.role}<SortIcon column="role" />
+                    {t.users.role}<SortIcon column="role" sortBy={sortBy} sortDir={sortDir} />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
@@ -105,7 +111,7 @@ export function UsersTable({
                     onClick={() => handleSort("createdAt")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    {t.users.joined}<SortIcon column="createdAt" />
+                    {t.users.joined}<SortIcon column="createdAt" sortBy={sortBy} sortDir={sortDir} />
                   </button>
                 </th>
                 <th className="text-right px-3 sm:px-5 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">

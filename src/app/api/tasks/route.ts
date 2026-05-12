@@ -108,8 +108,8 @@ export async function GET(request: Request) {
   const priority = searchParams.get("priority") || "all";
   const status = searchParams.get("status") || "all";
   const assignee = searchParams.get("assignee") || "";
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const limit = Math.max(1, Math.min(50, parseInt(searchParams.get("limit") || "6", 10)));
+  const page = Math.max(1, Number.parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.max(1, Math.min(50, Number.parseInt(searchParams.get("limit") || "6", 10)));
 
   // Map search keywords to priority/status values for unified search
   const priorityMap: Record<string, string[]> = {
@@ -149,8 +149,8 @@ export async function GET(request: Request) {
             ],
           }
         : {},
-      priority !== "all" ? { priority: priority as TaskPriority } : {},
-      status !== "all" ? { status: status as TaskStatus } : {},
+      priority === "all" ? {} : { priority: priority as TaskPriority },
+      status === "all" ? {} : { status: status as TaskStatus },
       assignee ? { assignees: { some: { userId: assignee } } } : {},
     ],
   };

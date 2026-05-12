@@ -18,11 +18,11 @@ interface MentionUser {
 }
 
 interface TaskDetailModalProps {
-  task: Task;
-  onClose: () => void;
-  onUpdate: (task: Task) => void;
-  currentUserRole?: UserRole;
-  currentUserId?: string;
+  readonly task: Task;
+  readonly onClose: () => void;
+  readonly onUpdate: (task: Task) => void;
+  readonly currentUserRole?: UserRole;
+  readonly currentUserId?: string;
 }
 
 export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, currentUserId }: TaskDetailModalProps) {
@@ -118,7 +118,7 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
 
   const handleCommentChange = (value: string) => {
     setNewComment(value);
-    const atMatch = value.match(/@(\S*)$/);
+    const atMatch = (/@(\S*)$/).exec(value);
     if (atMatch) {
       setMentionQuery(atMatch[1]);
       setMentionOpen(true);
@@ -165,7 +165,12 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Close"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-default border-0 p-0"
+        onClick={onClose}
+      />
       <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-2xl max-h-[90vh] overflow-y-auto card-shadow custom-scrollbar">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
@@ -212,7 +217,7 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
             )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            {editing ? (
+            {editing && (
               <button
                 onClick={handleSave}
                 disabled={saving}
@@ -221,7 +226,8 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
                 <Save className="w-3.5 h-3.5" />
                 {saving ? t.common.saving : t.common.save}
               </button>
-            ) : canEdit ? (
+            )}
+            {!editing && canEdit && (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-brand-500 border border-brand-500/30 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
@@ -229,7 +235,7 @@ export function TaskDetailModal({ task, onClose, onUpdate, currentUserRole, curr
                 <Edit2 className="w-3.5 h-3.5" />
                 {t.common.edit}
               </button>
-            ) : null}
+            )}
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
