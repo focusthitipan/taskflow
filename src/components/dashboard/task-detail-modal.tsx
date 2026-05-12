@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, Edit2, Save, Calendar, Tag, User, AlertCircle, MessageSquare } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { Task, TaskPriority, TaskStatus } from "@/types";
+import { useT } from "@/components/layout/i18n-provider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -13,24 +14,27 @@ interface TaskDetailModalProps {
   onUpdate: (task: Task) => void;
 }
 
-const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  urgent: "bg-red-100 text-red-500",
-  high: "bg-orange-100 text-orange-500",
-  medium: "bg-brand-100 text-brand-500",
-  low: "bg-green-100 text-green-500",
-};
-
-const STATUS_LABELS: Record<TaskStatus, string> = {
-  todo: "To Do",
-  in_progress: "In Progress",
-  done: "Done",
-};
-
 export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProps) {
+  const { t, locale } = useT();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ ...task });
   const [newComment, setNewComment] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const PRIORITY_COLORS: Record<TaskPriority, string> = {
+    urgent: "bg-red-100 text-red-500",
+    high: "bg-orange-100 text-orange-500",
+    medium: "bg-brand-100 text-brand-500",
+    low: "bg-green-100 text-green-500",
+  };
+
+  const STATUS_LABELS: Record<TaskStatus, string> = {
+    todo: t.dashboard.toDo,
+    in_progress: t.dashboard.inProgress,
+    done: t.dashboard.done,
+  };
+
+  const dateLocale = locale === "th" ? "th-TH" : "en-US";
 
   const handleSave = async () => {
     setSaving(true);
@@ -43,9 +47,9 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
       const data = await res.json();
       onUpdate(data.task);
       setEditing(false);
-      toast.success("Task updated successfully");
+      toast.success(t.dashboard.taskUpdated);
     } catch {
-      toast.error("Failed to update task");
+      toast.error(t.dashboard.failedUpdateTask);
     } finally {
       setSaving(false);
     }
@@ -63,11 +67,18 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
       if (data.comment) {
         setForm((f) => ({ ...f, comments: [...(f.comments || []), data.comment] }));
         setNewComment("");
-        toast.success("Comment added");
+        toast.success(t.dashboard.commentAdded);
       }
     } catch {
-      toast.error("Failed to add comment");
+      toast.error(t.dashboard.failedAddComment);
     }
+  };
+
+  const PRIORITY_LABELS: Record<TaskPriority, string> = {
+    urgent: t.dashboard.urgent,
+    high: t.dashboard.high,
+    medium: t.dashboard.medium,
+    low: t.dashboard.low,
   };
 
   return (
@@ -95,7 +106,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                   PRIORITY_COLORS[task.priority]
                 )}
               >
-                {task.priority}
+                {PRIORITY_LABELS[task.priority]}
               </span>
               <span className="text-xs font-medium px-2 py-1 rounded-[10px] bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-700 dark:text-white">
                 {STATUS_LABELS[task.status]}
@@ -126,7 +137,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white transition-colors duration-150 disabled:opacity-60 gradient-brand"
               >
                 <Save className="w-3.5 h-3.5" />
-                {saving ? "Saving..." : "Save"}
+                {saving ? t.common.saving : t.common.save}
               </button>
             ) : (
               <button
@@ -134,7 +145,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-brand-500 border border-brand-500/30 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
               >
                 <Edit2 className="w-3.5 h-3.5" />
-                Edit
+                {t.common.edit}
               </button>
             )}
             <button
@@ -150,7 +161,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
           {/* Description */}
           <div>
             <label className="text-sm font-bold text-secondaryGray-900 dark:text-white block mb-2">
-              Description
+              {t.dashboard.description}
             </label>
             {editing ? (
               <textarea
@@ -161,7 +172,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
               />
             ) : (
               <p className="text-sm text-secondaryGray-600 font-normal leading-[150%]">
-                {task.description || "No description provided."}
+                {task.description || t.dashboard.noDescription}
               </p>
             )}
           </div>
@@ -170,7 +181,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
-                <Calendar className="w-3.5 h-3.5" /> Due Date
+                <Calendar className="w-3.5 h-3.5" /> {t.dashboard.dueDate}
               </label>
               {editing ? (
                 <input
@@ -184,7 +195,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
               ) : (
                 <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
                   {task.dueDate
-                    ? new Date(task.dueDate).toLocaleDateString("en-US", {
+                    ? new Date(task.dueDate).toLocaleDateString(dateLocale, {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
@@ -196,7 +207,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
 
             <div>
               <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
-                <AlertCircle className="w-3.5 h-3.5" /> Priority
+                <AlertCircle className="w-3.5 h-3.5" /> {t.dashboard.priority}
               </label>
               {editing ? (
                 <select
@@ -204,9 +215,9 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                   onChange={(e) => setForm({ ...form, priority: e.target.value as TaskPriority })}
                   className="w-full h-10 px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
                 >
-                  {["urgent", "high", "medium", "low"].map((p) => (
+                  {(["urgent", "high", "medium", "low"] as TaskPriority[]).map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {PRIORITY_LABELS[p]}
                     </option>
                   ))}
                 </select>
@@ -217,14 +228,14 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                     PRIORITY_COLORS[task.priority]
                   )}
                 >
-                  {task.priority}
+                  {PRIORITY_LABELS[task.priority]}
                 </span>
               )}
             </div>
 
             <div>
               <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
-                <Tag className="w-3.5 h-3.5" /> Status
+                <Tag className="w-3.5 h-3.5" /> {t.dashboard.status}
               </label>
               {editing ? (
                 <select
@@ -232,9 +243,9 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                   onChange={(e) => setForm({ ...form, status: e.target.value as TaskStatus })}
                   className="w-full h-10 px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="done">Done</option>
+                  <option value="todo">{t.dashboard.toDo}</option>
+                  <option value="in_progress">{t.dashboard.inProgress}</option>
+                  <option value="done">{t.dashboard.done}</option>
                 </select>
               ) : (
                 <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
@@ -245,7 +256,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
 
             <div>
               <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
-                Progress
+                {t.dashboard.progress}
               </label>
               {editing ? (
                 <div className="flex items-center gap-2">
@@ -280,7 +291,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
 
             <div className="col-span-2">
               <label className="flex items-center gap-1.5 text-xs text-secondaryGray-600 font-normal mb-1.5">
-                <Tag className="w-3.5 h-3.5" /> Tags
+                <Tag className="w-3.5 h-3.5" /> {t.dashboard.tags}
               </label>
               {editing ? (
                 <input
@@ -294,7 +305,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                         .filter(Boolean),
                     })
                   }
-                  placeholder="e.g. Feature, Bug, UI"
+                  placeholder={t.dashboard.egTags}
                   className="w-full h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
                 />
               ) : (
@@ -319,7 +330,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
           {/* Assignees */}
           <div>
             <label className="flex items-center gap-1.5 text-sm font-bold text-secondaryGray-900 dark:text-white mb-3">
-              <User className="w-4 h-4" /> Assignees
+              <User className="w-4 h-4" /> {t.dashboard.assignees}
             </label>
             <div className="flex items-center gap-2 flex-wrap">
               {(task.assignees || []).map((user) => (
@@ -340,7 +351,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 </div>
               ))}
               {(!task.assignees || task.assignees.length === 0) && (
-                <span className="text-sm text-secondaryGray-600 font-normal">No assignees</span>
+                <span className="text-sm text-secondaryGray-600 font-normal">{t.dashboard.noDescription.split(".")[0]}</span>
               )}
             </div>
           </div>
@@ -348,7 +359,7 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
           {/* Comments */}
           <div>
             <label className="flex items-center gap-1.5 text-sm font-bold text-secondaryGray-900 dark:text-white mb-3">
-              <MessageSquare className="w-4 h-4" /> Comments ({form.comments?.length || 0})
+              <MessageSquare className="w-4 h-4" /> {t.dashboard.comments} ({form.comments?.length || 0})
             </label>
             <div className="space-y-3 mb-4">
               {(form.comments || []).map((comment) => (
@@ -381,14 +392,14 @@ export function TaskDetailModal({ task, onClose, onUpdate }: TaskDetailModalProp
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addComment()}
-                placeholder="Add a comment..."
+                placeholder={t.dashboard.addComment}
                 className="flex-1 h-10 px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
               />
               <button
                 onClick={addComment}
                 className="px-4 h-10 rounded-full text-sm font-bold text-white gradient-brand"
               >
-                Post
+                {t.common.post}
               </button>
             </div>
           </div>

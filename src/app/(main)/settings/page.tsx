@@ -16,6 +16,8 @@ import {
   Camera,
   Trash2,
 } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
+import type { Locale } from "@/lib/i18n/types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -23,14 +25,6 @@ import type { ActivityLog, WorkspaceSettings } from "@/types";
 import { useAccent, ACCENT_PALETTES } from "@/components/layout/accent-provider";
 
 type TabId = "profile" | "notifications" | "appearance" | "workspace" | "security";
-
-const TABS: { id: TabId; label: string; icon: React.ElementType; adminOnly?: boolean }[] = [
-  { id: "profile", label: "Profile", icon: User },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "workspace", label: "Workspace", icon: Building, adminOnly: true },
-  { id: "security", label: "Security", icon: Shield, adminOnly: true },
-];
 
 interface ProfileData {
   id: string;
@@ -46,6 +40,7 @@ interface ProfileData {
 }
 
 function ProfileTab() {
+  const { t, locale, setLocale } = useT();
   const { data: session } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,10 +76,10 @@ function ProfileTab() {
       const data = await res.json();
       if (data.profile) {
         setProfile(data.profile);
-        toast.success("Profile updated successfully");
+        toast.success(t.settings.profileUpdated);
       }
     } catch {
-      toast.error("Failed to update profile");
+      toast.error(t.settings.failedUpdateProfile);
     } finally {
       setSaving(false);
     }
@@ -95,7 +90,7 @@ function ProfileTab() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("File too large. Maximum size is 5MB");
+      toast.error(t.settings.fileTooLarge);
       return;
     }
 
@@ -110,12 +105,12 @@ function ProfileTab() {
       const data = await res.json();
       if (data.avatarUrl) {
         setProfile((prev) => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
-        toast.success("Avatar updated");
+        toast.success(t.settings.avatarUpdated);
       } else {
-        toast.error(data.error || "Failed to upload avatar");
+        toast.error(data.error || t.settings.failedUploadAvatar);
       }
     } catch {
-      toast.error("Failed to upload avatar");
+      toast.error(t.settings.failedUploadAvatar);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -128,13 +123,13 @@ function ProfileTab() {
       const res = await fetch("/api/settings/avatar", { method: "DELETE" });
       if (res.ok) {
         setProfile((prev) => prev ? { ...prev, avatarUrl: undefined } : prev);
-        toast.success("Avatar removed");
+        toast.success(t.settings.avatarRemoved);
       } else {
         const data = await res.json();
-        toast.error(data.error || "Failed to remove avatar");
+        toast.error(data.error || t.settings.failedRemoveAvatar);
       }
     } catch {
-      toast.error("Failed to remove avatar");
+      toast.error(t.settings.failedRemoveAvatar);
     } finally {
       setUploading(false);
     }
@@ -142,11 +137,11 @@ function ProfileTab() {
 
   const handleChangePassword = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t.settings.passwordsDoNotMatch);
       return;
     }
     if (passwordForm.newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error(t.settings.passwordMinLength);
       return;
     }
     setChangingPassword(true);
@@ -160,16 +155,24 @@ function ProfileTab() {
         }),
       });
       if (res.ok) {
-        toast.success("Password changed successfully");
+        toast.success(t.settings.passwordChanged);
         setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       } else {
         const err = await res.json();
-        toast.error(err.error || "Failed to change password");
+        toast.error(err.error || t.settings.failedChangePassword);
       }
     } catch {
-      toast.error("Failed to change password");
+      toast.error(t.settings.failedChangePassword);
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+  // Sync locale when language changes
+  const handleLanguageChange = (lang: string) => {
+    setProfile((prev) => prev ? { ...prev, language: lang } : prev);
+    if (lang === "en" || lang === "th") {
+      setLocale(lang as Locale);
     }
   };
 
@@ -181,7 +184,7 @@ function ProfileTab() {
     );
   }
 
-  if (!profile) return <p className="text-sm text-secondaryGray-600">Could not load profile.</p>;
+  if (!profile) return <p className="text-sm text-secondaryGray-600">{t.settings.couldNotLoadProfile}</p>;
 
   return (
     <div className="space-y-6">
@@ -207,7 +210,6 @@ function ProfileTab() {
               {profile.lastName[0]}
             </div>
           )}
-          {/* Upload overlay */}
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
@@ -244,12 +246,12 @@ function ProfileTab() {
                 className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-medium transition-colors duration-150"
               >
                 <Trash2 className="w-3 h-3" />
-                Remove
+                {t.settings.removeAvatar}
               </button>
             )}
           </div>
           <p className="text-[11px] text-secondaryGray-600 font-normal mt-2">
-            JPEG, PNG, WebP or GIF. Max 5MB. Recommended 256×256px
+            {t.settings.avatarHint}
           </p>
         </div>
       </div>
@@ -257,7 +259,7 @@ function ProfileTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            First Name
+            {t.settings.firstName}
           </label>
           <input
             value={profile.firstName}
@@ -267,7 +269,7 @@ function ProfileTab() {
         </div>
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Last Name
+            {t.settings.lastName}
           </label>
           <input
             value={profile.lastName}
@@ -277,7 +279,7 @@ function ProfileTab() {
         </div>
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Email
+            {t.settings.email}
           </label>
           <input
             value={profile.email}
@@ -288,7 +290,7 @@ function ProfileTab() {
         </div>
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Timezone
+            {t.settings.timezone}
           </label>
           <select
             value={profile.timezone || "UTC+7"}
@@ -306,17 +308,15 @@ function ProfileTab() {
         </div>
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Language
+            {t.settings.language}
           </label>
           <select
-            value={profile.language || "en"}
-            onChange={(e) => setProfile({ ...profile, language: e.target.value })}
+            value={profile.language || locale}
+            onChange={(e) => handleLanguageChange(e.target.value)}
             className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
           >
-            <option value="en">English</option>
-            <option value="th">Thai</option>
-            <option value="zh">Chinese</option>
-            <option value="ja">Japanese</option>
+            <option value="en">{t.settings.english}</option>
+            <option value="th">{t.settings.thai}</option>
           </select>
         </div>
       </div>
@@ -327,18 +327,18 @@ function ProfileTab() {
         className="flex items-center gap-2 h-[44px] px-6 rounded-full text-sm font-bold text-white gradient-brand disabled:opacity-60"
       >
         <Save className="w-4 h-4" />
-        {saving ? "Saving..." : "Save Changes"}
+        {saving ? t.common.saving : t.settings.saveChanges}
       </button>
 
       {/* Change Password */}
       <div className="pt-6 border-t border-secondaryGray-100 dark:border-white/10">
         <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
-          Change Password
+          {t.settings.changePassword}
         </h3>
         <div className="space-y-4 max-w-md">
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Current Password
+              {t.settings.currentPassword}
             </label>
             <input
               type="password"
@@ -349,7 +349,7 @@ function ProfileTab() {
           </div>
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              New Password
+              {t.settings.newPassword}
             </label>
             <input
               type="password"
@@ -360,7 +360,7 @@ function ProfileTab() {
           </div>
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Confirm New Password
+              {t.settings.confirmNewPassword}
             </label>
             <input
               type="password"
@@ -374,7 +374,7 @@ function ProfileTab() {
             disabled={changingPassword}
             className="flex items-center gap-2 h-[44px] px-6 rounded-full text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors duration-150 disabled:opacity-60"
           >
-            {changingPassword ? "Changing..." : "Change Password"}
+            {changingPassword ? t.settings.changing : t.settings.changePasswordBtn}
           </button>
         </div>
       </div>
@@ -383,6 +383,7 @@ function ProfileTab() {
 }
 
 function NotificationsTab() {
+  const { t } = useT();
   const [settings, setSettings] = useState({
     taskAssigned: true,
     taskDue: true,
@@ -413,17 +414,17 @@ function NotificationsTab() {
         body: JSON.stringify(updated),
       });
     } catch {
-      toast.error("Failed to save preferences");
+      toast.error(t.settings.failedSavePreferences);
     } finally {
       setSaving(false);
     }
   };
 
   const toggles = [
-    { key: "taskAssigned" as const, label: "Task Assigned", desc: "When a task is assigned to you" },
-    { key: "taskDue" as const, label: "Task Due Reminder", desc: "24 hours before task due date" },
-    { key: "commentMention" as const, label: "Comment Mentions", desc: "When someone mentions you" },
-    { key: "teamActivity" as const, label: "Team Activity", desc: "Weekly team digest email" },
+    { key: "taskAssigned" as const, label: t.settings.taskAssigned, desc: t.settings.taskAssignedDesc },
+    { key: "taskDue" as const, label: t.settings.taskDue, desc: t.settings.taskDueDesc },
+    { key: "commentMention" as const, label: t.settings.commentMention, desc: t.settings.commentMentionDesc },
+    { key: "teamActivity" as const, label: t.settings.teamActivity, desc: t.settings.teamActivityDesc },
   ];
 
   if (loading) {
@@ -437,29 +438,29 @@ function NotificationsTab() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-secondaryGray-600 font-normal">
-        Manage how and when you receive notifications.
+        {t.settings.manageNotifications}
       </p>
-      {toggles.map((t) => (
+      {toggles.map((tg) => (
         <div
-          key={t.key}
+          key={tg.key}
           className="flex items-center justify-between p-4 rounded-[20px] bg-secondaryGray-300 dark:bg-navy-700"
         >
           <div>
-            <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{t.label}</p>
-            <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{t.desc}</p>
+            <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">{tg.label}</p>
+            <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">{tg.desc}</p>
           </div>
           <button
-            onClick={() => handleToggle(t.key)}
+            onClick={() => handleToggle(tg.key)}
             disabled={saving}
             className={cn(
               "w-10 h-5 rounded-full p-0.5 transition-colors duration-200 flex items-center",
-              settings[t.key] ? "bg-brand-500" : "bg-secondaryGray-600"
+              settings[tg.key] ? "bg-brand-500" : "bg-secondaryGray-600"
             )}
           >
             <div
               className={cn(
                 "w-4 h-4 rounded-full bg-white transition-transform duration-200",
-                settings[t.key] ? "translate-x-5" : "translate-x-0"
+                settings[tg.key] ? "translate-x-5" : "translate-x-0"
               )}
             />
           </button>
@@ -470,6 +471,7 @@ function NotificationsTab() {
 }
 
 function AppearanceTab() {
+  const { t } = useT();
   const { theme, setTheme } = useTheme();
   const { accent, setAccent } = useAccent();
   const [mounted, setMounted] = useState(false);
@@ -477,9 +479,9 @@ function AppearanceTab() {
   useEffect(() => setMounted(true), []);
 
   const themes = [
-    { id: "light", label: "Light", icon: Sun },
-    { id: "dark", label: "Dark", icon: Moon },
-    { id: "system", label: "System", icon: Monitor },
+    { id: "light", label: t.settings.light, icon: Sun },
+    { id: "dark", label: t.settings.dark, icon: Moon },
+    { id: "system", label: t.settings.system, icon: Monitor },
   ];
 
   if (!mounted) {
@@ -495,18 +497,18 @@ function AppearanceTab() {
       {/* Theme */}
       <div>
         <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-3">
-          Color Mode
+          {t.settings.colorMode}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {themes.map((t) => {
-            const Icon = t.icon;
+          {themes.map((th) => {
+            const Icon = th.icon;
             return (
               <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
+                key={th.id}
+                onClick={() => setTheme(th.id)}
                 className={cn(
                   "flex flex-col items-center gap-2 p-4 rounded-[20px] border-2 transition-all duration-150",
-                  theme === t.id
+                  theme === th.id
                     ? "border-brand-500 bg-brand-100 dark:bg-brand-900/20"
                     : "border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700"
                 )}
@@ -514,18 +516,18 @@ function AppearanceTab() {
                 <Icon
                   className={cn(
                     "w-6 h-6",
-                    theme === t.id ? "text-brand-500" : "text-secondaryGray-600"
+                    theme === th.id ? "text-brand-500" : "text-secondaryGray-600"
                   )}
                 />
                 <span
                   className={cn(
                     "text-sm font-medium",
-                    theme === t.id
+                    theme === th.id
                       ? "text-brand-500 font-bold"
                       : "text-secondaryGray-600"
                   )}
                 >
-                  {t.label}
+                  {th.label}
                 </span>
               </button>
             );
@@ -536,7 +538,7 @@ function AppearanceTab() {
       {/* Accent color */}
       <div>
         <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-3">
-          Accent Color
+          {t.settings.accentColor}
         </h3>
         <div className="flex flex-wrap gap-3">
           {ACCENT_PALETTES.map((p) => (
@@ -553,7 +555,7 @@ function AppearanceTab() {
           ))}
         </div>
         <p className="text-xs text-secondaryGray-600 font-normal mt-2">
-          Selected: {ACCENT_PALETTES.find((p) => p.id === accent)?.label}
+          {t.settings.selected}: {ACCENT_PALETTES.find((p) => p.id === accent)?.label}
         </p>
       </div>
     </div>
@@ -561,6 +563,7 @@ function AppearanceTab() {
 }
 
 function WorkspaceTab() {
+  const { t } = useT();
   const [form, setForm] = useState<WorkspaceSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -596,9 +599,9 @@ function WorkspaceTab() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      toast.success("Workspace settings saved");
+      toast.success(t.settings.workspaceSaved);
     } catch {
-      toast.error("Failed to save workspace settings");
+      toast.error(t.settings.failedSaveWorkspace);
     } finally {
       setSaving(false);
     }
@@ -612,13 +615,13 @@ function WorkspaceTab() {
     );
   }
 
-  if (!form) return <p className="text-sm text-secondaryGray-600">Could not load workspace.</p>;
+  if (!form) return <p className="text-sm text-secondaryGray-600">{t.settings.couldNotLoadWorkspace}</p>;
 
   return (
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-          Workspace Name
+          {t.settings.workspaceName}
         </label>
         <input
           value={form.name}
@@ -629,7 +632,7 @@ function WorkspaceTab() {
 
       <div>
         <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-          Default Priority
+          {t.settings.defaultPriority}
         </label>
         <select
           value={form.defaultPriority}
@@ -638,16 +641,16 @@ function WorkspaceTab() {
           }
           className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
         >
-          <option value="urgent">Urgent</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
+          <option value="urgent">{t.dashboard.urgent}</option>
+          <option value="high">{t.dashboard.high}</option>
+          <option value="medium">{t.dashboard.medium}</option>
+          <option value="low">{t.dashboard.low}</option>
         </select>
       </div>
 
       <div>
         <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-3">
-          Working Days
+          {t.settings.workingDays}
         </label>
         <div className="flex flex-wrap gap-2">
           {DAYS.map((day) => (
@@ -670,7 +673,7 @@ function WorkspaceTab() {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Business Hours Start
+            {t.settings.businessHoursStart}
           </label>
           <input
             type="time"
@@ -681,7 +684,7 @@ function WorkspaceTab() {
         </div>
         <div>
           <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-            Business Hours End
+            {t.settings.businessHoursEnd}
           </label>
           <input
             type="time"
@@ -698,13 +701,14 @@ function WorkspaceTab() {
         className="flex items-center gap-2 h-[44px] px-6 rounded-full text-sm font-bold text-white gradient-brand disabled:opacity-60"
       >
         <Save className="w-4 h-4" />
-        {saving ? "Saving..." : "Save Settings"}
+        {saving ? t.common.saving : t.settings.saveSettings}
       </button>
     </div>
   );
 }
 
 function SecurityTab() {
+  const { t } = useT();
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -729,22 +733,22 @@ function SecurityTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white">Audit Log</h3>
+        <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white">{t.settings.auditLog}</h3>
         <button className="text-xs text-brand-500 font-medium hover:opacity-80 transition-opacity">
-          Export CSV
+          {t.users.exportCsv}
         </button>
       </div>
       <div className="bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
         {logs.length === 0 ? (
           <p className="text-sm text-secondaryGray-600 text-center py-10">
-            No audit logs found.
+            {t.settings.noAuditLogs}
           </p>
         ) : (
           <table className="w-full">
             <thead>
               <tr className="border-b border-secondaryGray-100 dark:border-white/10">
                 <th className="text-left px-5 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
-                  User
+                  {t.users.user}
                 </th>
                 <th className="text-left px-4 py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden md:table-cell">
                   Action
@@ -753,7 +757,7 @@ function SecurityTab() {
                   Target
                 </th>
                 <th className="text-right px-5 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
-                  When
+                  {t.settings.when}
                 </th>
               </tr>
             </thead>
@@ -803,11 +807,20 @@ function SecurityTab() {
 }
 
 export default function SettingsPage() {
+  const { t } = useT();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const isAdmin = (session?.user as { role?: string })?.role === "admin";
 
-  const visibleTabs = TABS.filter((t) => !t.adminOnly || isAdmin);
+  const TABS: { id: TabId; label: string; icon: React.ElementType; adminOnly?: boolean }[] = [
+    { id: "profile", label: t.settings.profile, icon: User },
+    { id: "notifications", label: t.settings.notifications, icon: Bell },
+    { id: "appearance", label: t.settings.appearance, icon: Palette },
+    { id: "workspace", label: t.settings.workspace, icon: Building, adminOnly: true },
+    { id: "security", label: t.settings.security, icon: Shield, adminOnly: true },
+  ];
+
+  const visibleTabs = TABS.filter((tb) => !tb.adminOnly || isAdmin);
 
   const renderTab = () => {
     switch (activeTab) {
@@ -850,7 +863,7 @@ export default function SettingsPage() {
       {/* Tab content */}
       <div className="bg-white dark:bg-navy-800 rounded-[20px] p-4 sm:p-6 card-shadow">
         <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-6">
-          {visibleTabs.find((t) => t.id === activeTab)?.label}
+          {visibleTabs.find((tb) => tb.id === activeTab)?.label}
         </h2>
         {renderTab()}
       </div>

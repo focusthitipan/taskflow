@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, X } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { TaskFilters } from "@/types";
 
 interface FilterBarProps {
@@ -8,22 +9,24 @@ interface FilterBarProps {
   onFiltersChange: (filters: TaskFilters) => void;
 }
 
-const PRIORITIES = [
-  { value: "all", label: "All Priorities" },
-  { value: "urgent", label: "Urgent" },
-  { value: "high", label: "High" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low" },
-];
-
-const STATUSES = [
-  { value: "all", label: "All Status" },
-  { value: "todo", label: "To Do" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "done", label: "Done" },
-];
-
 export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
+  const { t } = useT();
+
+  const PRIORITIES = [
+    { value: "all", label: t.dashboard.allPriorities },
+    { value: "urgent", label: t.dashboard.urgent },
+    { value: "high", label: t.dashboard.high },
+    { value: "medium", label: t.dashboard.medium },
+    { value: "low", label: t.dashboard.low },
+  ];
+
+  const STATUSES = [
+    { value: "all", label: t.dashboard.allStatus },
+    { value: "todo", label: t.dashboard.toDo },
+    { value: "in_progress", label: t.dashboard.inProgress },
+    { value: "done", label: t.dashboard.done },
+  ];
+
   const hasActiveFilters =
     filters.search || filters.priority !== "all" || filters.status !== "all";
 
@@ -38,7 +41,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
         <input
           value={filters.search}
           onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
-          placeholder="Search tasks..."
+          placeholder={t.dashboard.searchTasks}
           className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none"
         />
         {filters.search && (
@@ -88,7 +91,7 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
           className="h-[44px] px-4 rounded-2xl text-sm font-medium text-red-500 border border-red-500/30 hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors duration-150 flex items-center gap-2"
         >
           <X className="w-4 h-4" />
-          Clear
+          {t.common.clear}
         </button>
       )}
     </div>

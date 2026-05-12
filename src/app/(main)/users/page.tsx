@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { UsersTable } from "@/components/users/users-table";
 import { UserModal } from "@/components/users/user-modal";
 import { DeleteUserDialog } from "@/components/users/delete-user-dialog";
+import { useT } from "@/components/layout/i18n-provider";
 import type { User } from "@/types";
 
 interface PaginationMeta {
@@ -17,6 +18,7 @@ interface PaginationMeta {
 }
 
 export default function UsersPage() {
+  const { t } = useT();
   const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta>({ page: 1, limit: 10, total: 0, totalPages: 1 });
@@ -101,9 +103,9 @@ export default function UsersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
-          { label: "Total Users", value: pagination.total, color: "text-brand-500" },
-          { label: "Active", value: activeCount, color: "text-green-500" },
-          { label: "Admins", value: adminCount, color: "text-orange-500" },
+          { label: t.users.totalUsers, value: pagination.total, color: "text-brand-500" },
+          { label: t.users.active, value: activeCount, color: "text-green-500" },
+          { label: t.users.admins, value: adminCount, color: "text-orange-500" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -119,13 +121,13 @@ export default function UsersPage() {
 
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white">All Users</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white">{t.users.allUsers}</h2>
         <button
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand transition-all duration-250 ease"
         >
           <UserPlus className="w-4 h-4" />
-          <span className="hidden 2sm:inline">Add User</span>
+          <span className="hidden 2sm:inline">{t.users.addUser}</span>
         </button>
       </div>
 
@@ -136,7 +138,7 @@ export default function UsersPage() {
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); handleFilterChange(); }}
-            placeholder="Search users..."
+            placeholder={t.users.searchUsers}
             className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none"
           />
         </div>
@@ -146,10 +148,10 @@ export default function UsersPage() {
           onChange={(e) => { setRole(e.target.value); handleFilterChange(); }}
           className="h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-800 text-sm font-medium text-secondaryGray-900 dark:text-white"
         >
-          <option value="all">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="member">Member</option>
-          <option value="viewer">Viewer</option>
+          <option value="all">{t.users.allRoles}</option>
+          <option value="admin">{t.team.admin}</option>
+          <option value="member">{t.team.member}</option>
+          <option value="viewer">{t.team.viewer}</option>
         </select>
 
         <select
@@ -157,8 +159,8 @@ export default function UsersPage() {
           onChange={(e) => { setStatus(e.target.value); handleFilterChange(); }}
           className="h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-800 text-sm font-medium text-secondaryGray-900 dark:text-white"
         >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
+          <option value="all">{t.users.allStatus}</option>
+          <option value="active">{t.users.active}</option>
           <option value="inactive">Inactive</option>
         </select>
       </div>

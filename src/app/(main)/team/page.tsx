@@ -5,9 +5,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { MemberCard } from "@/components/team/member-card";
 import { WorkloadOverview } from "@/components/team/workload-overview";
 import { ActivityFeed } from "@/components/team/activity-feed";
+import { useT } from "@/components/layout/i18n-provider";
 import type { TeamMember, ActivityLog } from "@/types";
 
 export default function TeamPage() {
+  const { t } = useT();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [activity, setActivity] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,9 +50,9 @@ export default function TeamPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
-          { label: "Team Members", value: members.length, color: "text-brand-500" },
-          { label: "Online Now", value: onlineCount, color: "text-green-500" },
-          { label: "Total Tasks", value: totalTasks, color: "text-secondaryGray-900 dark:text-white" },
+          { label: t.team.teamMembers, value: members.length, color: "text-brand-500" },
+          { label: t.team.onlineNow, value: onlineCount, color: "text-green-500" },
+          { label: t.team.totalTasks, value: totalTasks, color: "text-secondaryGray-900 dark:text-white" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -67,7 +69,7 @@ export default function TeamPage() {
       {/* Member cards */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-4">
-          Team Members
+          {t.team.teamMembers}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {members.map((member) => (
@@ -85,7 +87,7 @@ export default function TeamPage() {
       {/* Team Performance Chart */}
       <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
         <h3 className="text-lg sm:text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
-          Task Distribution
+          {t.team.taskDistribution}
         </h3>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={chartData} barGap={4}>
@@ -115,18 +117,18 @@ export default function TeamPage() {
                 fontSize: 12,
               }}
             />
-            <Bar dataKey="total" fill="#A3AED0" name="Total Tasks" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="completed" fill="#422AFB" name="Completed" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="total" fill="#A3AED0" name={t.team.totalTasksLabel} radius={[8, 8, 0, 0]} />
+            <Bar dataKey="completed" fill="#422AFB" name={t.team.completedLabel} radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
         <div className="flex items-center gap-4 mt-4">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-secondaryGray-600" />
-            <span className="text-xs text-secondaryGray-600 font-normal">Total Tasks</span>
+            <span className="text-xs text-secondaryGray-600 font-normal">{t.team.totalTasksLabel}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-brand-500" />
-            <span className="text-xs text-secondaryGray-600 font-normal">Completed</span>
+            <span className="text-xs text-secondaryGray-600 font-normal">{t.team.completedLabel}</span>
           </div>
         </div>
       </div>

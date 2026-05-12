@@ -6,6 +6,7 @@ import { FilterBar } from "@/components/dashboard/filter-bar";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
 import { NewTaskModal } from "@/components/dashboard/new-task-modal";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task, TaskFilters } from "@/types";
 
 interface PaginationMeta {
@@ -16,6 +17,7 @@ interface PaginationMeta {
 }
 
 export default function DashboardPage() {
+  const { t } = useT();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [counts, setCounts] = useState({ todo: 0, in_progress: 0, done: 0 });
   const [pagination, setPagination] = useState<PaginationMeta>({ page: 1, limit: 6, total: 0, totalPages: 1 });
@@ -74,7 +76,6 @@ export default function DashboardPage() {
   }, []);
 
   const handleTaskCreated = () => {
-    // Refetch from current page
     fetchTasks();
   };
 
@@ -84,12 +85,12 @@ export default function DashboardPage() {
 
   return (
     <div>
-      {/* Stats row — shows total counts from API, not just current page */}
+      {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {[
-          { label: "To Do", count: counts.todo, color: "text-secondaryGray-600" },
-          { label: "In Progress", count: counts.in_progress, color: "text-orange-500" },
-          { label: "Completed", count: counts.done, color: "text-green-500" },
+          { label: t.dashboard.toDo, count: counts.todo, color: "text-secondaryGray-600" },
+          { label: t.dashboard.inProgress, count: counts.in_progress, color: "text-orange-500" },
+          { label: t.dashboard.completed, count: counts.done, color: "text-green-500" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -111,7 +112,7 @@ export default function DashboardPage() {
           className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand flex-shrink-0 transition-all duration-250 ease"
         >
           <Plus className="w-4 h-4" />
-          <span className="hidden 2sm:inline">New Task</span>
+          <span className="hidden 2sm:inline">{t.dashboard.newTask}</span>
           <span className="hidden md:block text-xs opacity-70 font-normal">(N)</span>
         </button>
       </div>

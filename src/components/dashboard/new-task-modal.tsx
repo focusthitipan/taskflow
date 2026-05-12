@@ -6,19 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task, User } from "@/types";
 import { toast } from "sonner";
-
-const schema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  priority: z.enum(["urgent", "high", "medium", "low"]),
-  status: z.enum(["todo", "in_progress", "done"]),
-  project: z.string().optional(),
-  dueDate: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
 
 interface NewTaskModalProps {
   onClose: () => void;
@@ -26,10 +16,22 @@ interface NewTaskModalProps {
 }
 
 export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
+  const { t } = useT();
   const { data: session } = useSession();
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  const schema = z.object({
+    title: z.string().min(1, t.dashboard.taskTitleRequired),
+    description: z.string().optional(),
+    priority: z.enum(["urgent", "high", "medium", "low"]),
+    status: z.enum(["todo", "in_progress", "done"]),
+    project: z.string().optional(),
+    dueDate: z.string().optional(),
+  });
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     register,
@@ -73,10 +75,10 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
       });
       const result = await res.json();
       onCreated(result.task);
-      toast.success("Task created successfully");
+      toast.success(t.dashboard.taskCreated);
       onClose();
     } catch {
-      toast.error("Failed to create task");
+      toast.error(t.dashboard.failedCreateTask);
     } finally {
       setSaving(false);
     }
@@ -89,7 +91,7 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
           <h2 className="text-xl font-bold text-secondaryGray-900 dark:text-white">
-            Create New Task
+            {t.dashboard.createNewTask}
           </h2>
           <button
             onClick={onClose}
@@ -103,11 +105,11 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           {/* Title */}
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Task Title *
+              {t.dashboard.taskTitle} *
             </label>
             <input
               {...register("title")}
-              placeholder="Enter task title..."
+              placeholder={t.dashboard.enterTaskTitle}
               className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
             />
             {errors.title && (
@@ -118,11 +120,11 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           {/* Description */}
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Description
+              {t.dashboard.description}
             </label>
             <textarea
               {...register("description")}
-              placeholder="Describe the task..."
+              placeholder={t.dashboard.describeTask}
               rows={3}
               className="w-full rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white p-4 placeholder:text-secondaryGray-600 placeholder:font-normal resize-none"
             />
@@ -132,29 +134,29 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Priority
+                {t.dashboard.priority}
               </label>
               <select
                 {...register("priority")}
                 className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
               >
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="urgent">{t.dashboard.urgent}</option>
+                <option value="high">{t.dashboard.high}</option>
+                <option value="medium">{t.dashboard.medium}</option>
+                <option value="low">{t.dashboard.low}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Status
+                {t.dashboard.status}
               </label>
               <select
                 {...register("status")}
                 className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
               >
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="done">Done</option>
+                <option value="todo">{t.dashboard.toDo}</option>
+                <option value="in_progress">{t.dashboard.inProgress}</option>
+                <option value="done">{t.dashboard.done}</option>
               </select>
             </div>
           </div>
@@ -163,17 +165,17 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Project
+                {t.dashboard.project}
               </label>
               <input
                 {...register("project")}
-                placeholder="Project name..."
+                placeholder={t.dashboard.projectName}
                 className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal"
               />
             </div>
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Due Date
+                {t.dashboard.dueDate}
               </label>
               <input
                 {...register("dueDate")}
@@ -186,7 +188,7 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
           {/* Assignees */}
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Assignees
+              {t.dashboard.assignees}
             </label>
             <div className="flex flex-wrap gap-2">
               {availableUsers.filter((u) => u.status === "active").map((user) => {
@@ -213,7 +215,7 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
                 );
               })}
               {availableUsers.length === 0 && (
-                <span className="text-xs text-secondaryGray-600 font-normal">Loading members...</span>
+                <span className="text-xs text-secondaryGray-600 font-normal">{t.dashboard.loadingMembers}</span>
               )}
             </div>
           </div>
@@ -225,14 +227,14 @@ export function NewTaskModal({ onClose, onCreated }: NewTaskModalProps) {
               onClick={onClose}
               className="flex-1 h-[44px] rounded-full border border-secondaryGray-100 dark:border-white/10 text-sm font-bold text-secondaryGray-900 dark:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
               disabled={saving}
               className="flex-1 h-[44px] rounded-full text-sm font-bold text-white gradient-brand transition-all duration-250 ease disabled:opacity-60"
             >
-              {saving ? "Creating..." : "Create Task"}
+              {saving ? t.dashboard.creating : t.dashboard.createTask}
             </button>
           </div>
         </form>

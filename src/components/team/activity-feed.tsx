@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/layout/i18n-provider";
 import type { ActivityLog } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 
@@ -16,10 +17,12 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ activity }: ActivityFeedProps) {
+  const { t } = useT();
+
   return (
     <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
       <h3 className="text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
-        Recent Activity
+        {t.team.recentActivity}
       </h3>
       <div className="space-y-4">
         {activity.map((log, idx) => (
@@ -65,7 +68,7 @@ export function ActivityFeed({ activity }: ActivityFeedProps) {
 
         {activity.length === 0 && (
           <p className="text-sm text-secondaryGray-600 font-normal text-center py-8">
-            No recent activity
+            {t.team.noRecentActivity}
           </p>
         )}
       </div>

@@ -14,6 +14,7 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ interface CalendarViewProps {
 }
 
 export function CalendarView({ tasks }: CalendarViewProps) {
+  const { t } = useT();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const monthStart = startOfMonth(currentDate);
@@ -55,6 +57,8 @@ export function CalendarView({ tasks }: CalendarViewProps) {
     day = addDays(day, 1);
   }
 
+  const DAY_HEADERS = [t.myTasks.sun, t.myTasks.mon, t.myTasks.tue, t.myTasks.wed, t.myTasks.thu, t.myTasks.fri, t.myTasks.sat];
+
   return (
     <div className="bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
       {/* Calendar header */}
@@ -73,7 +77,7 @@ export function CalendarView({ tasks }: CalendarViewProps) {
             onClick={() => setCurrentDate(new Date())}
             className="px-3 h-8 rounded-full text-xs font-medium text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
           >
-            Today
+            {t.common.today}
           </button>
           <button
             onClick={() => setCurrentDate(addMonths(currentDate, 1))}
@@ -86,7 +90,7 @@ export function CalendarView({ tasks }: CalendarViewProps) {
 
       {/* Day headers */}
       <div className="grid grid-cols-7 border-b border-secondaryGray-100 dark:border-white/10">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+        {DAY_HEADERS.map((d) => (
           <div
             key={d}
             className="py-3 text-center text-[10px] font-normal text-secondaryGray-600 uppercase"
@@ -144,7 +148,7 @@ export function CalendarView({ tasks }: CalendarViewProps) {
                   ))}
                   {dayTasks.length > 3 && (
                     <p className="text-[9px] text-secondaryGray-600 font-normal pl-1">
-                      +{dayTasks.length - 3} more
+                      +{dayTasks.length - 3} {t.myTasks.more}
                     </p>
                   )}
                 </div>

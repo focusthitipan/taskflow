@@ -7,14 +7,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, Zap, ArrowRight, AlertCircle } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import { toast } from "sonner";
-
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
 
 const DEMO_ACCOUNTS = [
   { email: "admin@taskflow.io", password: "admin123", role: "Admin", color: "#422AFB" },
@@ -22,9 +16,17 @@ const DEMO_ACCOUNTS = [
 ];
 
 export default function LoginPage() {
+  const { t } = useT();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const loginSchema = z.object({
+    email: z.string().email(t.login.validEmail),
+    password: z.string().min(1, t.login.passwordRequired),
+  });
+
+  type LoginForm = z.infer<typeof loginSchema>;
 
   const {
     register,
@@ -45,13 +47,13 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast.error("Invalid credentials. Please try again.");
+        toast.error(t.login.invalidCredentials);
       } else {
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t.login.somethingWentWrong);
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +90,10 @@ export default function LoginPage() {
         <div className="bg-white dark:bg-navy-800 rounded-[30px] p-5 sm:p-8 card-shadow">
           <div className="mb-6">
             <h1 className="text-[28px] font-bold text-secondaryGray-900 dark:text-white leading-none mb-2">
-              Welcome back
+              {t.login.welcomeBack}
             </h1>
             <p className="text-sm text-secondaryGray-600 font-normal">
-              Sign in to your account to continue
+              {t.login.signInContinue}
             </p>
           </div>
 
@@ -99,7 +101,7 @@ export default function LoginPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Email address
+                {t.login.emailAddress}
               </label>
               <input
                 {...register("email")}
@@ -118,13 +120,13 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Password
+                {t.login.password}
               </label>
               <div className="relative">
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={t.login.enterPassword}
                   className="w-full h-[44px] px-4 pr-12 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-700 text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal text-sm font-medium transition-all duration-250 ease"
                 />
                 <button
@@ -153,7 +155,7 @@ export default function LoginPage() {
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Sign in
+                  {t.login.signIn}
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -163,7 +165,7 @@ export default function LoginPage() {
           {/* Demo accounts */}
           <div className="mt-6 pt-6 border-t border-secondaryGray-100 dark:border-white/10">
             <p className="text-xs text-secondaryGray-600 text-center mb-3 font-normal">
-              Demo accounts — click to fill
+              {t.login.demoAccounts}
             </p>
             <div className="grid grid-cols-1 2sm:grid-cols-2 gap-2">
               {DEMO_ACCOUNTS.map((acc) => (

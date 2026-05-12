@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Download, CalendarDays, ZoomIn, ZoomOut, RefreshCw } from "lucide-react";
 import { DailyChart } from "@/components/graph/daily-chart";
+import { useT } from "@/components/layout/i18n-provider";
 import type { GraphDataPoint } from "@/types";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
 export default function GraphPage() {
+  const { t } = useT();
   const [data, setData] = useState<GraphDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -22,7 +24,7 @@ export default function GraphPage() {
       const json = await res.json();
       setData(json.data);
     } catch {
-      toast.error("Failed to load graph data");
+      toast.error(t.graph.failedLoadData);
     } finally {
       setLoading(false);
     }
@@ -47,10 +49,10 @@ export default function GraphPage() {
       const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvas.width / 2, canvas.height / 2] });
       pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
       pdf.save(`daily-graph-${selectedDate}.pdf`);
-      toast.success("PDF exported successfully");
+      toast.success(t.graph.pdfExported);
     } catch (err) {
       console.error(err);
-      toast.error("Export failed");
+      toast.error(t.graph.exportFailed);
     } finally {
       setExporting(false);
     }
@@ -67,17 +69,17 @@ export default function GraphPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
-              label: "Avg Productivity",
+              label: t.graph.avgProductivity,
               value: `${Math.round(data.reduce((a, d) => a + d.productivity, 0) / data.length)}%`,
               color: "text-green-500",
             },
             {
-              label: "Avg Energy",
+              label: t.graph.avgEnergy,
               value: `${Math.round(data.reduce((a, d) => a + d.energy, 0) / data.length)}`,
               color: "text-orange-500",
             },
             {
-              label: "Avg Focus",
+              label: t.graph.avgFocus,
               value: `${(data.reduce((a, d) => a + d.focus, 0) / data.length).toFixed(1)}/10`,
               color: "text-blue-500",
             },
@@ -101,10 +103,10 @@ export default function GraphPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-secondaryGray-900 dark:text-white">
-              Daily Performance
+              {t.graph.dailyPerformance}
             </h3>
             <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">
-              3-axis tracking: Productivity · Energy · Focus
+              {t.graph.axisTracking}
             </p>
           </div>
 
@@ -156,7 +158,7 @@ export default function GraphPage() {
               className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand transition-all duration-250 ease disabled:opacity-60"
             >
               <Download className="w-4 h-4" />
-              {exporting ? "Exporting..." : "Export PDF"}
+              {exporting ? t.common.exporting : t.common.exportPdf}
             </button>
           </div>
         </div>
@@ -164,9 +166,9 @@ export default function GraphPage() {
         {/* Legend */}
         <div className="flex items-center gap-6 mb-4">
           {[
-            { label: "Productivity (0–100%)", color: "#01B574" },
-            { label: "Energy (–100 to 100)", color: "#FFB547" },
-            { label: "Focus (0–10)", color: "#3965FF" },
+            { label: `${t.graph.productivity} (0–100%)`, color: "#01B574" },
+            { label: `${t.graph.energy} (–100 to 100)`, color: "#FFB547" },
+            { label: `${t.graph.focus} (0–10)`, color: "#3965FF" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-2">
               <div className="w-6 h-0.5 rounded-full" style={{ backgroundColor: item.color }} />
@@ -191,22 +193,22 @@ export default function GraphPage() {
       {!loading && data.length > 0 && (
         <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto custom-scrollbar">
           <h3 className="text-base sm:text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
-            Hourly Data
+            {t.graph.hourlyData}
           </h3>
           <table className="w-full min-w-[500px]">
             <thead>
               <tr className="border-b border-secondaryGray-100 dark:border-white/10">
                 <th className="text-left pb-3 text-xs text-secondaryGray-600 font-normal uppercase">
-                  Hour
+                  {t.graph.hour}
                 </th>
                 <th className="text-right pb-3 text-xs text-green-500 font-normal uppercase">
-                  Productivity
+                  {t.graph.productivity}
                 </th>
                 <th className="text-right pb-3 text-xs text-orange-500 font-normal uppercase">
-                  Energy
+                  {t.graph.energy}
                 </th>
                 <th className="text-right pb-3 text-xs text-blue-500 font-normal uppercase">
-                  Focus
+                  {t.graph.focus}
                 </th>
               </tr>
             </thead>

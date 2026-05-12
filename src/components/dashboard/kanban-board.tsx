@@ -18,14 +18,9 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Task, TaskStatus } from "@/types";
 import { TaskCard } from "./task-card";
 import { TaskDetailModal } from "./task-detail-modal";
+import { useT } from "@/components/layout/i18n-provider";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-const COLUMNS: { id: TaskStatus; label: string; dotColor: string }[] = [
-  { id: "todo", label: "To Do", dotColor: "bg-secondaryGray-600" },
-  { id: "in_progress", label: "In Progress", dotColor: "bg-orange-500" },
-  { id: "done", label: "Done", dotColor: "bg-green-500" },
-];
 
 function SortableTaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -51,11 +46,13 @@ function DroppableColumn({
   tasks,
   onTaskClick,
   isOver,
+  dropText,
 }: {
   column: { id: TaskStatus; label: string; dotColor: string };
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   isOver: boolean;
+  dropText: string;
 }) {
   const { setNodeRef } = useDroppable({ id: column.id });
 
@@ -91,7 +88,7 @@ function DroppableColumn({
 
         {tasks.length === 0 && (
           <div className="flex items-center justify-center h-24 rounded-[20px] border-2 border-dashed border-secondaryGray-200 dark:border-white/10 mt-2">
-            <p className="text-xs text-secondaryGray-600 font-normal">Drop tasks here</p>
+            <p className="text-xs text-secondaryGray-600 font-normal">{dropText}</p>
           </div>
         )}
       </div>
@@ -105,9 +102,16 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
+  const { t } = useT();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [overColumn, setOverColumn] = useState<TaskStatus | null>(null);
+
+  const COLUMNS: { id: TaskStatus; label: string; dotColor: string }[] = [
+    { id: "todo", label: t.dashboard.toDo, dotColor: "bg-secondaryGray-600" },
+    { id: "in_progress", label: t.dashboard.inProgress, dotColor: "bg-orange-500" },
+    { id: "done", label: t.dashboard.done, dotColor: "bg-green-500" },
+  ];
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -142,14 +146,12 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
 
-    // Find target column
     const targetColId = COLUMNS.find((c) => c.id === over.id)?.id;
     const overTaskColId = tasks.find((t) => t.id === over.id)?.status;
     const newStatus = targetColId || overTaskColId;
 
     if (!newStatus || task.status === newStatus) return;
 
-    // Optimistic update
     const updated = tasks.map((t) =>
       t.id === taskId ? { ...t, status: newStatus, updatedAt: new Date().toISOString() } : t
     );
@@ -161,10 +163,10 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      toast.success(`Moved to ${COLUMNS.find((c) => c.id === newStatus)?.label}`);
+      toast.success(`${t.dashboard.movedTo} ${COLUMNS.find((c) => c.id === newStatus)?.label}`);
     } catch {
       onTasksChange(tasks);
-      toast.error("Failed to update task status");
+      toast.error(t.dashboard.failedUpdateStatus);
     }
   };
 
@@ -190,6 +192,7 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
                 tasks={tasksByColumn(column.id)}
                 onTaskClick={setSelectedTask}
                 isOver={overColumn === column.id}
+                dropText={t.dashboard.dropTasksHere}
               />
             </div>
           ))}

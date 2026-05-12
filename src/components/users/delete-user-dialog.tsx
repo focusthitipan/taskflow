@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, X } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { User } from "@/types";
 import { toast } from "sonner";
 
@@ -12,6 +13,7 @@ interface DeleteUserDialogProps {
 }
 
 export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogProps) {
+  const { t } = useT();
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -19,10 +21,10 @@ export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogP
     try {
       await fetch(`/api/users/${user.id}`, { method: "DELETE" });
       onDeleted(user.id);
-      toast.success("User deleted successfully");
+      toast.success(t.users.userDeleted);
       onClose();
     } catch {
-      toast.error("Failed to delete user");
+      toast.error(t.users.failedDeleteUser);
     } finally {
       setDeleting(false);
     }
@@ -44,14 +46,14 @@ export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogP
         </div>
 
         <h2 className="text-xl font-bold text-secondaryGray-900 dark:text-white mb-2">
-          Delete User
+          {t.users.deleteUserConfirm}
         </h2>
         <p className="text-sm text-secondaryGray-600 font-normal leading-[150%] mb-6">
-          Are you sure you want to delete{" "}
+          {t.users.deleteUserWarning}{" "}
           <span className="font-bold text-secondaryGray-900 dark:text-white">
             {user.firstName} {user.lastName}
           </span>
-          ? This action cannot be undone.
+          ? {t.users.cannotUndone}
         </p>
 
         <div className="flex items-center gap-3">
@@ -59,14 +61,14 @@ export function DeleteUserDialog({ user, onClose, onDeleted }: DeleteUserDialogP
             onClick={onClose}
             className="flex-1 h-[44px] rounded-full border border-secondaryGray-100 dark:border-white/10 text-sm font-bold text-secondaryGray-900 dark:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
           >
-            Cancel
+            {t.common.cancel}
           </button>
           <button
             onClick={handleDelete}
             disabled={deleting}
             className="flex-1 h-[44px] rounded-full text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors duration-150 disabled:opacity-60"
           >
-            {deleting ? "Deleting..." : "Delete User"}
+            {deleting ? t.users.deleting : t.users.deleteUserBtn}
           </button>
         </div>
       </div>

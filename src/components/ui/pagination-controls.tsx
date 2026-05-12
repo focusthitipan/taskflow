@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import { cn } from "@/lib/utils";
 
 interface PaginationControlsProps {
@@ -11,6 +12,8 @@ interface PaginationControlsProps {
 }
 
 export function PaginationControls({ page, totalPages, total, onPageChange }: PaginationControlsProps) {
+  const { t } = useT();
+
   if (totalPages <= 1 && total <= 0) return null;
 
   const pages: (number | "...")[] = [];
@@ -29,7 +32,7 @@ export function PaginationControls({ page, totalPages, total, onPageChange }: Pa
   return (
     <div className="flex items-center justify-between mt-6">
       <p className="text-xs text-secondaryGray-600 font-normal">
-        Showing page {page} of {totalPages} ({total} total tasks)
+        {t.dashboard.title} {page} {t.users.of} {totalPages} ({total} {t.team.totalTasksLabel.toLowerCase()})
       </p>
       <div className="flex items-center gap-1">
         <button

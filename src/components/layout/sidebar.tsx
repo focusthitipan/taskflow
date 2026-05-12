@@ -15,28 +15,30 @@ import {
   Shield,
 } from "lucide-react";
 import { useSidebar } from "./sidebar-context";
+import { useT } from "./i18n-provider";
 import { cn } from "@/lib/utils";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/my-tasks", label: "My Tasks", icon: CheckSquare },
-  { href: "/team", label: "Team", icon: Users },
-  { href: "/graph", label: "Daily Graph", icon: BarChart3 },
-];
-
-const ADMIN_ITEMS = [
-  { href: "/users", label: "User Management", icon: Shield },
-];
-
-const BOTTOM_ITEMS = [
-  { href: "/settings", label: "Settings", icon: Settings },
-];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { collapsed, toggle, mobileOpen, setMobileOpen, isMobile } = useSidebar();
+  const { t } = useT();
   const isAdmin = (session?.user as { role?: string })?.role === "admin";
+
+  const NAV_ITEMS = [
+    { href: "/dashboard", label: t.nav.dashboard, icon: LayoutDashboard },
+    { href: "/my-tasks", label: t.nav.myTasks, icon: CheckSquare },
+    { href: "/team", label: t.nav.team, icon: Users },
+    { href: "/graph", label: t.nav.dailyGraph, icon: BarChart3 },
+  ];
+
+  const ADMIN_ITEMS = [
+    { href: "/users", label: t.nav.userManagement, icon: Shield },
+  ];
+
+  const BOTTOM_ITEMS = [
+    { href: "/settings", label: t.nav.settings, icon: Settings },
+  ];
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
@@ -117,7 +119,7 @@ export function Sidebar() {
           <>
             {(!collapsed || isMobile) && (
               <p className="text-[10px] font-bold text-secondaryGray-600 uppercase tracking-wider px-4 pt-4 pb-1">
-                Admin
+                {t.nav.admin}
               </p>
             )}
             {ADMIN_ITEMS.map((item) => (
@@ -144,7 +146,7 @@ export function Sidebar() {
             ) : (
               <>
                 <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-normal">Collapse</span>
+                <span className="text-sm font-normal">{t.nav.collapse}</span>
               </>
             )}
           </button>

@@ -3,14 +3,8 @@
 import { Calendar, MessageSquare } from "lucide-react";
 import { differenceInDays, parseISO } from "date-fns";
 import type { Task } from "@/types";
+import { useT } from "@/components/layout/i18n-provider";
 import { cn } from "@/lib/utils";
-
-const PRIORITY_CONFIG = {
-  urgent: { label: "Urgent", bg: "bg-red-100 dark:bg-red-500/20", text: "text-red-500" },
-  high: { label: "High", bg: "bg-orange-100 dark:bg-orange-500/20", text: "text-orange-500" },
-  medium: { label: "Medium", bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
-  low: { label: "Low", bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
-};
 
 interface TaskCardProps {
   task: Task;
@@ -19,6 +13,7 @@ interface TaskCardProps {
 }
 
 function DueDateBadge({ dueDate }: { dueDate: string }) {
+  const { t } = useT();
   const days = differenceInDays(parseISO(dueDate), new Date());
   const isOverdue = days < 0;
   const isUrgent = days >= 0 && days <= 2;
@@ -36,15 +31,24 @@ function DueDateBadge({ dueDate }: { dueDate: string }) {
     >
       <Calendar className="w-3 h-3" />
       {isOverdue
-        ? `${Math.abs(days)}d overdue`
+        ? `${Math.abs(days)}${t.dashboard.daysOverdue}`
         : days === 0
-          ? "Today"
-          : `${days}d left`}
+          ? t.common.today
+          : `${days}${t.dashboard.daysLeft}`}
     </span>
   );
 }
 
 export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
+  const { t } = useT();
+
+  const PRIORITY_CONFIG = {
+    urgent: { label: t.dashboard.urgent, bg: "bg-red-100 dark:bg-red-500/20", text: "text-red-500" },
+    high: { label: t.dashboard.high, bg: "bg-orange-100 dark:bg-orange-500/20", text: "text-orange-500" },
+    medium: { label: t.dashboard.medium, bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
+    low: { label: t.dashboard.low, bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
+  };
+
   const priority = PRIORITY_CONFIG[task.priority];
   const maxAvatars = 3;
   const assignees = task.assignees || [];
@@ -63,7 +67,7 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
       {/* Header: project + priority */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <span className="text-xs text-secondaryGray-600 font-normal truncate">
-          {task.project || "No Project"}
+          {task.project || t.dashboard.noProject}
         </span>
         <span
           className={cn(
@@ -99,7 +103,7 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
       {task.progress !== undefined && (
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-secondaryGray-600 font-normal">Progress</span>
+            <span className="text-xs text-secondaryGray-600 font-normal">{t.dashboard.progress}</span>
             <span className="text-xs font-bold text-secondaryGray-900 dark:text-white">
               {task.progress}%
             </span>
@@ -134,7 +138,7 @@ export function TaskCard({ task, onClick, isDragging }: TaskCardProps) {
             </div>
           )}
           {assignees.length === 0 && (
-            <span className="text-xs text-secondaryGray-600 font-normal">Unassigned</span>
+            <span className="text-xs text-secondaryGray-600 font-normal">{t.dashboard.unassigned}</span>
           )}
         </div>
 

@@ -1,19 +1,22 @@
 "use client";
 
+import { useT } from "@/components/layout/i18n-provider";
 import type { TeamMember } from "@/types";
 import { cn } from "@/lib/utils";
-
-const ROLE_CONFIG = {
-  admin: { label: "Admin", bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
-  member: { label: "Member", bg: "bg-secondaryGray-300 dark:bg-navy-700", text: "text-secondaryGray-700 dark:text-secondaryGray-600" },
-  viewer: { label: "Viewer", bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
-};
 
 interface MemberCardProps {
   member: TeamMember;
 }
 
 export function MemberCard({ member }: MemberCardProps) {
+  const { t } = useT();
+
+  const ROLE_CONFIG = {
+    admin: { label: t.team.admin, bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
+    member: { label: t.team.member, bg: "bg-secondaryGray-300 dark:bg-navy-700", text: "text-secondaryGray-700 dark:text-secondaryGray-600" },
+    viewer: { label: t.team.viewer, bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
+  };
+
   const roleConfig = ROLE_CONFIG[member.role];
   const completionRate =
     member.taskCount > 0
@@ -65,20 +68,20 @@ export function MemberCard({ member }: MemberCardProps) {
           <p className="text-xl font-bold text-secondaryGray-900 dark:text-white leading-none">
             {member.taskCount}
           </p>
-          <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">Total Tasks</p>
+          <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">{t.team.totalTasksLabel}</p>
         </div>
         <div className="text-center p-3 rounded-[10px] bg-green-100 dark:bg-green-500/20">
           <p className="text-xl font-bold text-green-500 leading-none">
             {member.completedTaskCount}
           </p>
-          <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">Completed</p>
+          <p className="text-[10px] text-secondaryGray-600 font-normal mt-1">{t.team.completedLabel}</p>
         </div>
       </div>
 
       {/* Completion rate */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-secondaryGray-600 font-normal">Completion Rate</span>
+          <span className="text-xs text-secondaryGray-600 font-normal">{t.team.completionRate}</span>
           <span className="text-xs font-bold text-secondaryGray-900 dark:text-white">
             {completionRate}%
           </span>
@@ -93,9 +96,9 @@ export function MemberCard({ member }: MemberCardProps) {
 
       <div className="mt-3 text-xs text-secondaryGray-600 font-normal">
         {member.isOnline ? (
-          <span className="text-green-500 font-medium">● Online</span>
+          <span className="text-green-500 font-medium">● {t.team.online}</span>
         ) : (
-          <span>● Offline</span>
+          <span>● {t.team.offline}</span>
         )}
       </div>
     </div>

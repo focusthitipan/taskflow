@@ -1,19 +1,9 @@
 "use client";
 
 import { Edit2, Trash2, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { User, UserRole, UserStatus } from "@/types";
 import { cn } from "@/lib/utils";
-
-const ROLE_CONFIG: Record<UserRole, { bg: string; text: string }> = {
-  admin: { bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
-  member: { bg: "bg-secondaryGray-300 dark:bg-navy-700", text: "text-secondaryGray-700 dark:text-white" },
-  viewer: { bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
-};
-
-const STATUS_CONFIG: Record<UserStatus, { bg: string; text: string; dot: string }> = {
-  active: { bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500", dot: "bg-green-500" },
-  inactive: { bg: "bg-red-100 dark:bg-red-500/20", text: "text-red-500", dot: "bg-red-500" },
-};
 
 interface PaginationMeta {
   page: number;
@@ -33,13 +23,6 @@ interface UsersTableProps {
   onDelete: (user: User) => void;
 }
 
-const SORTABLE_COLUMNS = [
-  { key: "name", label: "User" },
-  { key: "email", label: "Email" },
-  { key: "role", label: "Role" },
-  { key: "createdAt", label: "Joined" },
-] as const;
-
 export function UsersTable({
   users,
   pagination,
@@ -50,6 +33,25 @@ export function UsersTable({
   onEdit,
   onDelete,
 }: UsersTableProps) {
+  const { t } = useT();
+
+  const ROLE_CONFIG: Record<UserRole, { bg: string; text: string }> = {
+    admin: { bg: "bg-brand-100 dark:bg-brand-900/40", text: "text-brand-500" },
+    member: { bg: "bg-secondaryGray-300 dark:bg-navy-700", text: "text-secondaryGray-700 dark:text-white" },
+    viewer: { bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500" },
+  };
+
+  const ROLE_LABELS: Record<UserRole, string> = {
+    admin: t.team.admin,
+    member: t.team.member,
+    viewer: t.team.viewer,
+  };
+
+  const STATUS_CONFIG: Record<UserStatus, { bg: string; text: string; dot: string }> = {
+    active: { bg: "bg-green-100 dark:bg-green-500/20", text: "text-green-500", dot: "bg-green-500" },
+    inactive: { bg: "bg-red-100 dark:bg-red-500/20", text: "text-red-500", dot: "bg-red-500" },
+  };
+
   const handleSort = (key: string) => {
     onSortChange(key);
   };
@@ -76,7 +78,7 @@ export function UsersTable({
                     onClick={() => handleSort("name")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    User<SortIcon column="name" />
+                    {t.users.user}<SortIcon column="name" />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden md:table-cell">
@@ -84,7 +86,7 @@ export function UsersTable({
                     onClick={() => handleSort("email")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    Email<SortIcon column="email" />
+                    {t.users.email}<SortIcon column="email" />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
@@ -92,22 +94,22 @@ export function UsersTable({
                     onClick={() => handleSort("role")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    Role<SortIcon column="role" />
+                    {t.users.role}<SortIcon column="role" />
                   </button>
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
-                  Status
+                  {t.users.status}
                 </th>
                 <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden lg:table-cell">
                   <button
                     onClick={() => handleSort("createdAt")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
                   >
-                    Joined<SortIcon column="createdAt" />
+                    {t.users.joined}<SortIcon column="createdAt" />
                   </button>
                 </th>
                 <th className="text-right px-3 sm:px-5 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
-                  Actions
+                  {t.users.actions}
                 </th>
               </tr>
             </thead>
@@ -139,7 +141,7 @@ export function UsersTable({
                     </td>
                     <td className="px-3 sm:px-4 py-3 sm:py-4">
                       <span className={cn("text-xs font-bold px-2 py-1 rounded-[10px]", rc.bg, rc.text)}>
-                        {user.role}
+                        {ROLE_LABELS[user.role]}
                       </span>
                     </td>
                     <td className="px-3 sm:px-4 py-3 sm:py-4">
@@ -189,9 +191,9 @@ export function UsersTable({
         {/* Pagination */}
         <div className="flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 border-t border-secondaryGray-100 dark:border-white/10 flex-wrap gap-2">
           <p className="text-xs text-secondaryGray-600 font-normal">
-            Showing {(pagination.page - 1) * pagination.limit + 1}–
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-            {pagination.total} users
+            {t.users.showing} {(pagination.page - 1) * pagination.limit + 1}–
+            {Math.min(pagination.page * pagination.limit, pagination.total)} {t.users.of}{" "}
+            {pagination.total} {t.users.users}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -216,7 +218,7 @@ export function UsersTable({
 
         {users.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-sm text-secondaryGray-600 font-normal">No users found</p>
+            <p className="text-sm text-secondaryGray-600 font-normal">{t.users.noUsersFound}</p>
           </div>
         )}
       </div>

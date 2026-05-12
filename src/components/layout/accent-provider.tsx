@@ -99,15 +99,6 @@ export const ACCENT_PALETTES: AccentPalette[] = [
   },
 ];
 
-const DARK_HSL: Record<string, string> = {
-  50: "249 30% 98%",
-  100: "251 100% 95%",
-  400: "249 100% 67%",
-  500: "249 100% 67%",
-  600: "250 86% 60%",
-  900: "238 80% 85%",
-};
-
 const STORAGE_KEY = "taskflow-accent";
 
 interface AccentContextValue {
@@ -126,23 +117,14 @@ export function useAccent() {
   return ctx;
 }
 
-function applyPalette(palette: AccentPalette, isDark: boolean) {
+function applyPalette(palette: AccentPalette) {
   const root = document.documentElement;
-  if (isDark) {
-    root.style.setProperty("--brand-50", DARK_HSL[50]!);
-    root.style.setProperty("--brand-100", DARK_HSL[100]!);
-    root.style.setProperty("--brand-400", DARK_HSL[400]!);
-    root.style.setProperty("--brand-500", DARK_HSL[500]!);
-    root.style.setProperty("--brand-600", DARK_HSL[600]!);
-    root.style.setProperty("--brand-900", DARK_HSL[900]!);
-  } else {
-    root.style.setProperty("--brand-50", palette.hsl[50]);
-    root.style.setProperty("--brand-100", palette.hsl[100]);
-    root.style.setProperty("--brand-400", palette.hsl[400]);
-    root.style.setProperty("--brand-500", palette.hsl[500]);
-    root.style.setProperty("--brand-600", palette.hsl[600]);
-    root.style.setProperty("--brand-900", palette.hsl[900]);
-  }
+  root.style.setProperty("--brand-50", palette.hsl[50]);
+  root.style.setProperty("--brand-100", palette.hsl[100]);
+  root.style.setProperty("--brand-400", palette.hsl[400]);
+  root.style.setProperty("--brand-500", palette.hsl[500]);
+  root.style.setProperty("--brand-600", palette.hsl[600]);
+  root.style.setProperty("--brand-900", palette.hsl[900]);
 }
 
 export function AccentProvider({ children }: { children: React.ReactNode }) {
@@ -165,25 +147,11 @@ export function AccentProvider({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
 
-  // Apply CSS variables when accent or dark mode changes
+  // Apply CSS variables when accent changes
   useEffect(() => {
     if (!hydrated) return;
     const palette = ACCENT_PALETTES.find((p) => p.id === accent) ?? ACCENT_PALETTES[0]!;
-
-    const isDark = document.documentElement.classList.contains("dark");
-    applyPalette(palette, isDark);
-
-    // Observe dark mode class changes
-    const observer = new MutationObserver(() => {
-      const dark = document.documentElement.classList.contains("dark");
-      applyPalette(palette, dark);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
+    applyPalette(palette);
   }, [accent, hydrated]);
 
   const setAccent = useCallback((id: AccentId) => {

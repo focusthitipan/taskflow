@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AccentProvider } from "@/components/layout/accent-provider";
+import { I18nProvider } from "@/components/layout/i18n-provider";
 
 export const metadata: Metadata = {
   title: "TaskFlow — Team Task Management",
@@ -44,10 +45,12 @@ export default function RootLayout({
       </head>
       <body className="font-sans tracking-[-0.5px]">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <AccentProvider>
-            {children}
-            <Toaster />
-          </AccentProvider>
+          <I18nProvider>
+            <AccentProvider>
+              {children}
+              <Toaster />
+            </AccentProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

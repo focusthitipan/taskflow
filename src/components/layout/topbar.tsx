@@ -6,22 +6,15 @@ import { Bell, Search, LogOut, User, Settings, ChevronDown, Menu } from "lucide-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect, useCallback } from "react";
 import { useSidebar } from "./sidebar-context";
+import { useT } from "./i18n-provider";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import type { Notification } from "@/types";
 
-const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/my-tasks": "My Tasks",
-  "/team": "Team",
-  "/graph": "Daily Graph",
-  "/users": "User Management",
-  "/settings": "Settings",
-};
-
 export function Topbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { t, locale } = useT();
   const { collapsed, toggleMobile, isMobile } = useSidebar();
   const [notifOpen, setNotifOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
@@ -30,6 +23,15 @@ export function Topbar() {
   const [searchValue, setSearchValue] = useState("");
 
   const userId = (session?.user as { id?: string })?.id;
+
+  const PAGE_TITLES: Record<string, string> = {
+    "/dashboard": t.dashboard.title,
+    "/my-tasks": t.myTasks.title,
+    "/team": t.team.title,
+    "/graph": t.graph.title,
+    "/users": t.users.title,
+    "/settings": t.settings.title,
+  };
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) return;
@@ -63,6 +65,8 @@ export function Topbar() {
   const userAvatarColor = (user as { avatarColor?: string | null })?.avatarColor;
 
   const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 300;
+
+  const dateLocale = locale === "th" ? "th-TH" : "en-US";
 
   const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -105,7 +109,7 @@ export function Topbar() {
               {title}
             </h1>
             <p className="text-xs sm:text-sm text-secondaryGray-600 font-normal mt-1 hidden 2sm:block">
-              {new Date().toLocaleDateString("en-US", {
+              {new Date().toLocaleDateString(dateLocale, {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
@@ -123,7 +127,7 @@ export function Topbar() {
             <input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search..."
+              placeholder={t.topbar.search}
               className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none min-w-0"
             />
           </div>
@@ -155,7 +159,7 @@ export function Topbar() {
                 <div className="absolute right-0 top-12 z-50 w-[300px] sm:w-[340px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
                   <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10">
                     <p className="font-bold text-secondaryGray-900 dark:text-white text-sm">
-                      Notifications
+                      {t.topbar.notifications}
                       {unreadCount > 0 && (
                         <span className="ml-2 px-2 py-0.5 rounded-[10px] bg-brand-100 dark:bg-brand-900 text-brand-500 dark:text-brand-400 text-xs font-bold">
                           {unreadCount}
@@ -167,7 +171,7 @@ export function Topbar() {
                         onClick={markAllRead}
                         className="text-xs text-brand-500 dark:text-brand-400 font-medium hover:opacity-80 transition-opacity"
                       >
-                        Mark all read
+                        {t.topbar.markAllRead}
                       </button>
                     )}
                   </div>
@@ -178,7 +182,7 @@ export function Topbar() {
                       </div>
                     ) : notifications.length === 0 ? (
                       <p className="text-sm text-secondaryGray-600 text-center py-8">
-                        No notifications
+                        {t.topbar.noNotifications}
                       </p>
                     ) : (
                       notifications.map((n) => (
@@ -272,14 +276,14 @@ export function Topbar() {
                     className="flex items-center gap-3 w-full px-4 py-3 text-sm text-secondaryGray-900 dark:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
                   >
                     <User className="w-4 h-4 text-secondaryGray-600" />
-                    Profile & Settings
+                    {t.topbar.profileSettings}
                   </button>
                   <button
                     onClick={() => signOut({ callbackUrl: "/login" })}
                     className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-500 hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors duration-150"
                   >
                     <LogOut className="w-4 h-4" />
-                    Sign out
+                    {t.topbar.signOut}
                   </button>
                 </div>
               </>

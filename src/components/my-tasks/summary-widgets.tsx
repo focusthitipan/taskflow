@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, Clock, CheckCircle2, TrendingUp } from "lucide-react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task } from "@/types";
 import { differenceInDays, parseISO } from "date-fns";
 
@@ -9,6 +10,7 @@ interface SummaryWidgetsProps {
 }
 
 export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
+  const { t } = useT();
   const now = new Date();
 
   const overdue = tasks.filter(
@@ -31,7 +33,7 @@ export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
 
   const widgets = [
     {
-      label: "Overdue",
+      label: t.myTasks.overdue,
       value: overdue,
       icon: AlertCircle,
       bg: "bg-red-100 dark:bg-red-500/20",
@@ -39,7 +41,7 @@ export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
       valueColor: "text-red-500",
     },
     {
-      label: "Due Today",
+      label: t.myTasks.dueToday,
       value: dueToday,
       icon: Clock,
       bg: "bg-orange-100 dark:bg-orange-500/20",
@@ -47,7 +49,7 @@ export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
       valueColor: "text-orange-500",
     },
     {
-      label: "On Track",
+      label: t.myTasks.onTrack,
       value: onTrack,
       icon: TrendingUp,
       bg: "bg-brand-100 dark:bg-brand-900/40",
@@ -55,7 +57,7 @@ export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
       valueColor: "text-brand-500",
     },
     {
-      label: "Completed",
+      label: t.myTasks.completed,
       value: completed,
       icon: CheckCircle2,
       bg: "bg-green-100 dark:bg-green-500/20",

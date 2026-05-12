@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/layout/i18n-provider";
 import type { TeamMember } from "@/types";
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
@@ -9,10 +10,12 @@ interface WorkloadOverviewProps {
 }
 
 export function WorkloadOverview({ members }: WorkloadOverviewProps) {
+  const { t } = useT();
+
   return (
     <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
       <h3 className="text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
-        Team Workload
+        {t.team.teamWorkload}
       </h3>
       <div className="space-y-4">
         {members.map((member) => {
@@ -34,7 +37,7 @@ export function WorkloadOverview({ members }: WorkloadOverviewProps) {
                       {member.firstName} {member.lastName}
                     </p>
                     <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">
-                      {member.taskCount} tasks
+                      {member.taskCount} {t.team.tasks}
                     </p>
                   </div>
                 </div>

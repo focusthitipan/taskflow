@@ -5,19 +5,9 @@ import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useT } from "@/components/layout/i18n-provider";
 import type { User } from "@/types";
 import { toast } from "sonner";
-
-const schema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email"),
-  role: z.enum(["admin", "member", "viewer"]),
-  status: z.enum(["active", "inactive"]),
-  password: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
 
 const AVATAR_COLORS = [
   "#422AFB", "#01B574", "#FFB547", "#EE5D50", "#3965FF",
@@ -32,6 +22,19 @@ interface UserModalProps {
 }
 
 export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
+  const { t } = useT();
+
+  const schema = z.object({
+    firstName: z.string().min(1, t.users.firstNameRequired),
+    lastName: z.string().min(1, t.users.lastNameRequired),
+    email: z.string().email(t.users.invalidEmail),
+    role: z.enum(["admin", "member", "viewer"]),
+    status: z.enum(["active", "inactive"]),
+    password: z.string().optional(),
+  });
+
+  type FormData = z.infer<typeof schema>;
+
   const {
     register,
     handleSubmit,
@@ -69,7 +72,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
         });
         const result = await res.json();
         onSaved(result.user);
-        toast.success("User created successfully");
+        toast.success(t.users.userCreated);
       } else if (user) {
         const res = await fetch(`/api/users/${user.id}`, {
           method: "PUT",
@@ -78,11 +81,11 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
         });
         const result = await res.json();
         onSaved(result.user);
-        toast.success("User updated successfully");
+        toast.success(t.users.userUpdated);
       }
       onClose();
     } catch {
-      toast.error(`Failed to ${mode === "add" ? "create" : "update"} user`);
+      toast.error(mode === "add" ? t.users.failedCreateUser : t.users.failedUpdateUser);
     }
   };
 
@@ -92,7 +95,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
       <div className="relative bg-white dark:bg-navy-800 rounded-[30px] w-full max-w-md card-shadow overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-secondaryGray-100 dark:border-white/10">
           <h2 className="text-xl font-bold text-secondaryGray-900 dark:text-white">
-            {mode === "add" ? "Add New User" : "Edit User"}
+            {mode === "add" ? t.users.addNewUser : t.users.editUser}
           </h2>
           <button
             onClick={onClose}
@@ -106,7 +109,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                First Name *
+                {t.users.firstName} *
               </label>
               <input
                 {...register("firstName")}
@@ -119,7 +122,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
             </div>
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Last Name *
+                {t.users.lastName} *
               </label>
               <input
                 {...register("lastName")}
@@ -134,7 +137,7 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
 
           <div>
             <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-              Email *
+              {t.users.email} *
             </label>
             <input
               {...register("email")}
@@ -150,12 +153,12 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
           {mode === "add" && (
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Password
+                {t.users.password}
               </label>
               <input
                 {...register("password")}
                 type="password"
-                placeholder="Temporary password..."
+                placeholder={t.users.tempPassword}
                 className="w-full h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600"
               />
             </div>
@@ -164,26 +167,26 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Role
+                {t.users.role}
               </label>
               <select
                 {...register("role")}
                 className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
               >
-                <option value="admin">Admin</option>
-                <option value="member">Member</option>
-                <option value="viewer">Viewer</option>
+                <option value="admin">{t.team.admin}</option>
+                <option value="member">{t.team.member}</option>
+                <option value="viewer">{t.team.viewer}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-secondaryGray-900 dark:text-white ms-[10px] mb-2">
-                Status
+                {t.users.status}
               </label>
               <select
                 {...register("status")}
                 className="w-full h-[44px] px-3 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-secondaryGray-300 dark:bg-navy-700 text-sm text-secondaryGray-900 dark:text-white"
               >
-                <option value="active">Active</option>
+                <option value="active">{t.users.active}</option>
                 <option value="inactive">Inactive</option>
               </select>
             </div>
@@ -195,14 +198,14 @@ export function UserModal({ mode, user, onClose, onSaved }: UserModalProps) {
               onClick={onClose}
               className="flex-1 h-[44px] rounded-full border border-secondaryGray-100 dark:border-white/10 text-sm font-bold text-secondaryGray-900 dark:text-white hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 h-[44px] rounded-full text-sm font-bold text-white gradient-brand disabled:opacity-60"
             >
-              {isSubmitting ? "Saving..." : mode === "add" ? "Add User" : "Save Changes"}
+              {isSubmitting ? t.users.saving : mode === "add" ? t.users.addUser : t.users.saveChanges}
             </button>
           </div>
         </form>

@@ -1,17 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
 import { differenceInDays, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  urgent: "bg-red-100 text-red-500",
-  high: "bg-orange-100 text-orange-500",
-  medium: "bg-brand-100 text-brand-500",
-  low: "bg-green-100 text-green-500",
-};
 
 interface ListViewProps {
   tasks: Task[];
@@ -19,7 +13,22 @@ interface ListViewProps {
 }
 
 export function ListView({ tasks, onTasksChange }: ListViewProps) {
+  const { t } = useT();
   const [updating, setUpdating] = useState<string | null>(null);
+
+  const PRIORITY_COLORS: Record<TaskPriority, string> = {
+    urgent: "bg-red-100 text-red-500",
+    high: "bg-orange-100 text-orange-500",
+    medium: "bg-brand-100 text-brand-500",
+    low: "bg-green-100 text-green-500",
+  };
+
+  const PRIORITY_LABELS: Record<TaskPriority, string> = {
+    urgent: t.dashboard.urgent,
+    high: t.dashboard.high,
+    medium: t.dashboard.medium,
+    low: t.dashboard.low,
+  };
 
   const updateStatus = async (taskId: string, newStatus: TaskStatus) => {
     setUpdating(taskId);
@@ -34,10 +43,10 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      toast.success("Status updated");
+      toast.success(t.myTasks.statusUpdated);
     } catch {
       onTasksChange(tasks);
-      toast.error("Failed to update status");
+      toast.error(t.myTasks.failedUpdateStatus);
     } finally {
       setUpdating(null);
     }
@@ -49,22 +58,22 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
         <thead>
           <tr className="border-b border-secondaryGray-100 dark:border-white/10">
             <th className="text-left px-5 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider">
-              Task
+              {t.dashboard.taskTitle}
             </th>
             <th className="text-left px-4 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider hidden md:table-cell">
-              Project
+              {t.dashboard.project}
             </th>
             <th className="text-left px-4 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider hidden lg:table-cell">
-              Priority
+              {t.dashboard.priority}
             </th>
             <th className="text-left px-4 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider">
-              Status
+              {t.dashboard.status}
             </th>
             <th className="text-left px-4 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider hidden md:table-cell">
-              Due Date
+              {t.dashboard.dueDate}
             </th>
             <th className="text-left px-4 py-4 text-[10px] font-normal text-secondaryGray-600 uppercase tracking-wider hidden lg:table-cell">
-              Progress
+              {t.dashboard.progress}
             </th>
           </tr>
         </thead>
@@ -99,7 +108,7 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
                 </td>
                 <td className="px-4 py-4 hidden md:table-cell">
                   <span className="text-sm text-secondaryGray-600 font-normal">
-                    {task.project || "—"}
+                    {task.project || t.common.none}
                   </span>
                 </td>
                 <td className="px-4 py-4 hidden lg:table-cell">
@@ -109,7 +118,7 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
                       PRIORITY_COLORS[task.priority]
                     )}
                   >
-                    {task.priority}
+                    {PRIORITY_LABELS[task.priority]}
                   </span>
                 </td>
                 <td className="px-4 py-4">
@@ -119,9 +128,9 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
                     onChange={(e) => updateStatus(task.id, e.target.value as TaskStatus)}
                     className="text-xs font-medium rounded-[10px] px-2 py-1 bg-secondaryGray-300 dark:bg-navy-700 text-secondaryGray-900 dark:text-white border-none"
                   >
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="done">Done</option>
+                    <option value="todo">{t.dashboard.toDo}</option>
+                    <option value="in_progress">{t.dashboard.inProgress}</option>
+                    <option value="done">{t.dashboard.done}</option>
                   </select>
                 </td>
                 <td className="px-4 py-4 hidden md:table-cell">
@@ -132,10 +141,10 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
                         isOverdue ? "text-red-500" : "text-secondaryGray-600"
                       )}
                     >
-                      {isOverdue ? `${Math.abs(daysLeft!)}d overdue` : `${daysLeft}d left`}
+                      {isOverdue ? `${Math.abs(daysLeft!)}${t.dashboard.daysOverdue}` : `${daysLeft}${t.dashboard.daysLeft}`}
                     </span>
                   ) : (
-                    <span className="text-xs text-secondaryGray-600">—</span>
+                    <span className="text-xs text-secondaryGray-600">{t.common.none}</span>
                   )}
                 </td>
                 <td className="px-4 py-4 hidden lg:table-cell">
@@ -158,7 +167,7 @@ export function ListView({ tasks, onTasksChange }: ListViewProps) {
       </table>
       {tasks.length === 0 && (
         <div className="py-12 text-center">
-          <p className="text-sm text-secondaryGray-600 font-normal">No tasks found</p>
+          <p className="text-sm text-secondaryGray-600 font-normal">{t.myTasks.noTasksFound}</p>
         </div>
       )}
     </div>

@@ -7,12 +7,14 @@ import { SummaryWidgets } from "@/components/my-tasks/summary-widgets";
 import { ListView } from "@/components/my-tasks/list-view";
 import { CalendarView } from "@/components/my-tasks/calendar-view";
 import { KanbanBoard } from "@/components/dashboard/kanban-board";
+import { useT } from "@/components/layout/i18n-provider";
 import type { Task } from "@/types";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "kanban" | "list" | "calendar";
 
 export default function MyTasksPage() {
+  const { t } = useT();
   const { data: session } = useSession();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [view, setView] = useState<ViewMode>("kanban");
@@ -30,9 +32,9 @@ export default function MyTasksPage() {
   }, [userId]);
 
   const views: { id: ViewMode; label: string; icon: React.ElementType }[] = [
-    { id: "kanban", label: "Kanban", icon: LayoutGrid },
-    { id: "list", label: "List", icon: List },
-    { id: "calendar", label: "Calendar", icon: CalendarDays },
+    { id: "kanban", label: t.myTasks.kanban, icon: LayoutGrid },
+    { id: "list", label: t.myTasks.list, icon: List },
+    { id: "calendar", label: t.myTasks.calendar, icon: CalendarDays },
   ];
 
   return (
