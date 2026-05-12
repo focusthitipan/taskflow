@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import type { TaskStatus, TaskPriority } from "@/types";
 
-function mapTask(t: Awaited<ReturnType<typeof db.task.findUnique>> & { assignees?: Array<{ user: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarColor: string | null; createdAt: Date } }>; comments?: Array<{ id: string; taskId: string; userId: string; content: string; createdAt: Date; user: { id: string; firstName: string; lastName: string; avatarColor: string | null } | null }> }) {
+function mapTask(t: Awaited<ReturnType<typeof db.task.findUnique>> & { assignees?: Array<{ user: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarUrl: string | null; avatarColor: string | null; createdAt: Date } }>; comments?: Array<{ id: string; taskId: string; userId: string; content: string; createdAt: Date; user: { id: string; firstName: string; lastName: string; avatarUrl: string | null; avatarColor: string | null } | null }> }) {
   if (!t) return null;
   return {
     id: t.id,
@@ -23,6 +23,7 @@ function mapTask(t: Awaited<ReturnType<typeof db.task.findUnique>> & { assignees
       email: a.user.email,
       role: a.user.role,
       status: a.user.status,
+      avatarUrl: a.user.avatarUrl,
       avatarColor: a.user.avatarColor,
       createdAt: a.user.createdAt.toISOString(),
     })),
@@ -37,6 +38,7 @@ function mapTask(t: Awaited<ReturnType<typeof db.task.findUnique>> & { assignees
             id: c.user.id,
             firstName: c.user.firstName,
             lastName: c.user.lastName,
+            avatarUrl: c.user.avatarUrl,
             avatarColor: c.user.avatarColor,
           }
         : null,

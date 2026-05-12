@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Bell, Search, LogOut, User, Settings, ChevronDown, Menu } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect, useCallback } from "react";
 import { useSidebar } from "./sidebar-context";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,8 @@ export function Topbar() {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  const userAvatarUrl = (user as { avatarUrl?: string | null })?.avatarUrl;
+  const userAvatarColor = (user as { avatarColor?: string | null })?.avatarColor;
 
   const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 300;
 
@@ -233,9 +236,15 @@ export function Topbar() {
               }}
               className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 rounded-full bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150"
             >
-              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full gradient-brand flex items-center justify-center text-white text-xs font-bold">
-                {userInitials}
-              </div>
+              <Avatar className="w-6 h-6 sm:w-7 sm:h-7">
+                {userAvatarUrl && <AvatarImage src={userAvatarUrl} alt={userName} />}
+                <AvatarFallback
+                  className="text-white text-xs font-bold"
+                  style={{ backgroundColor: userAvatarColor || "#422AFB" }}
+                >
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
               <span className="hidden sm:block text-sm font-bold text-secondaryGray-900 dark:text-white">
                 {userName.split(" ")[0]}
               </span>

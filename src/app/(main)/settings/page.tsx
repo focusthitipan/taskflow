@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import {
@@ -13,6 +13,8 @@ import {
   Moon,
   Sun,
   Monitor,
+  Camera,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -38,6 +40,7 @@ interface ProfileData {
   role: string;
   status: string;
   avatarColor?: string;
+  avatarUrl?: string;
   timezone?: string;
   language?: string;
 }
@@ -47,6 +50,8 @@ function ProfileTab() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -82,6 +87,56 @@ function ProfileTab() {
       toast.error("Failed to update profile");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Maximum size is 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/settings/avatar", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.avatarUrl) {
+        setProfile((prev) => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
+        toast.success("Avatar updated");
+      } else {
+        toast.error(data.error || "Failed to upload avatar");
+      }
+    } catch {
+      toast.error("Failed to upload avatar");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setUploading(true);
+    try {
+      const res = await fetch("/api/settings/avatar", { method: "DELETE" });
+      if (res.ok) {
+        setProfile((prev) => prev ? { ...prev, avatarUrl: undefined } : prev);
+        toast.success("Avatar removed");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to remove avatar");
+      }
+    } catch {
+      toast.error("Failed to remove avatar");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -132,21 +187,70 @@ function ProfileTab() {
     <div className="space-y-6">
       {/* Avatar */}
       <div className="flex items-center gap-4">
-        <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-navy-800 card-shadow"
-          style={{ backgroundColor: profile.avatarColor || "#422AFB" }}
-        >
-          {profile.firstName[0]}
-          {profile.lastName[0]}
+        <div className="relative group">
+          {profile.avatarUrl ? (
+            <div
+              className="w-20 h-20 rounded-full overflow-hidden border-4 border-white dark:border-navy-800 card-shadow"
+            >
+              <img
+                src={profile.avatarUrl}
+                alt={`${profile.firstName} ${profile.lastName}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-navy-800 card-shadow"
+              style={{ backgroundColor: profile.avatarColor || "#422AFB" }}
+            >
+              {profile.firstName[0]}
+              {profile.lastName[0]}
+            </div>
+          )}
+          {/* Upload overlay */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="absolute inset-0 w-20 h-20 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+          >
+            <Camera className="w-5 h-5 text-white" />
+          </button>
+          {uploading && (
+            <div className="absolute inset-0 w-20 h-20 rounded-full bg-black/50 flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            </div>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleAvatarUpload}
+            className="hidden"
+          />
         </div>
         <div>
           <p className="text-lg font-bold text-secondaryGray-900 dark:text-white">
             {profile.firstName} {profile.lastName}
           </p>
           <p className="text-sm text-secondaryGray-600 font-normal">{profile.email}</p>
-          <span className="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded-[10px] bg-brand-100 dark:bg-brand-900/40 text-brand-500">
-            {profile.role}
-          </span>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="inline-block text-xs font-bold px-2 py-0.5 rounded-[10px] bg-brand-100 dark:bg-brand-900/40 text-brand-500">
+              {profile.role}
+            </span>
+            {profile.avatarUrl && (
+              <button
+                onClick={handleAvatarRemove}
+                disabled={uploading}
+                className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-medium transition-colors duration-150"
+              >
+                <Trash2 className="w-3 h-3" />
+                Remove
+              </button>
+            )}
+          </div>
+          <p className="text-[11px] text-secondaryGray-600 font-normal mt-2">
+            JPEG, PNG, WebP or GIF. Max 5MB. Recommended 256×256px
+          </p>
         </div>
       </div>
 

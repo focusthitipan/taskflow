@@ -35,6 +35,7 @@ export async function GET(request: Request) {
             email: log.user.email,
             role: log.user.role,
             status: log.user.status,
+            avatarUrl: log.user.avatarUrl,
             avatarColor: log.user.avatarColor,
             createdAt: log.user.createdAt.toISOString(),
           }

@@ -30,6 +30,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
             role: user.role,
+            avatarUrl: user.avatarUrl,
+            avatarColor: user.avatarColor,
           };
         } catch (error) {
           console.error("Auth error:", error);
@@ -46,6 +48,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as { role?: string }).role;
         token.id = user.id;
+        token.avatarUrl = (user as { avatarUrl?: string | null }).avatarUrl;
+        token.avatarColor = (user as { avatarColor?: string | null }).avatarColor;
       }
       return token;
     },
@@ -53,6 +57,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as { role?: string }).role = token.role as string;
         (session.user as { id?: string }).id = token.id as string;
+        (session.user as { avatarUrl?: string | null }).avatarUrl = token.avatarUrl as string | null;
+        (session.user as { avatarColor?: string | null }).avatarColor = token.avatarColor as string | null;
       }
       return session;
     },

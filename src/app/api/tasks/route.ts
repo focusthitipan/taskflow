@@ -23,6 +23,7 @@ function mapTask(t: {
       email: string;
       role: string;
       status: string;
+      avatarUrl: string | null;
       avatarColor: string | null;
       createdAt: Date;
     };
@@ -40,6 +41,7 @@ function mapTask(t: {
       email: string;
       role: string;
       status: string;
+      avatarUrl: string | null;
       avatarColor: string | null;
       createdAt: Date;
     } | null;
@@ -65,6 +67,7 @@ function mapTask(t: {
       email: a.user.email,
       role: a.user.role,
       status: a.user.status,
+      avatarUrl: a.user.avatarUrl,
       avatarColor: a.user.avatarColor,
       createdAt: a.user.createdAt.toISOString(),
     })),
@@ -82,6 +85,7 @@ function mapTask(t: {
             email: c.user.email,
             role: c.user.role,
             status: c.user.status,
+            avatarUrl: c.user.avatarUrl,
             avatarColor: c.user.avatarColor,
             createdAt: c.user.createdAt.toISOString(),
           }

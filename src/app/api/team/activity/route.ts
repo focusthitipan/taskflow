@@ -25,6 +25,7 @@ export async function GET() {
             email: a.user.email,
             role: a.user.role,
             status: a.user.status,
+            avatarUrl: a.user.avatarUrl,
             avatarColor: a.user.avatarColor,
             createdAt: a.user.createdAt.toISOString(),
           }

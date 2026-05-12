@@ -15,6 +15,7 @@ model User {
   role        UserRole @default(member)
   status      UserStatus @default(active)
   avatarColor String?
+  avatarUrl   String?
   timezone    String?  @default("UTC+7")
   language    String?  @default("en")
   isOnline    Boolean  @default(false)

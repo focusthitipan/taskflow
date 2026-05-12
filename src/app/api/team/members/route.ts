@@ -26,6 +26,7 @@ export async function GET() {
         email: u.email,
         role: u.role,
         status: u.status,
+        avatarUrl: u.avatarUrl,
         avatarColor: u.avatarColor,
         timezone: u.timezone,
         language: u.language,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import type { UserRole, UserStatus } from "@/types";
 
-function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarColor: string | null; timezone: string | null; language: string | null; isOnline: boolean; createdAt: Date }) {
+function mapUser(u: { id: string; firstName: string; lastName: string; email: string; role: string; status: string; avatarUrl: string | null; avatarColor: string | null; timezone: string | null; language: string | null; isOnline: boolean; createdAt: Date }) {
   return {
     id: u.id,
     firstName: u.firstName,
@@ -10,6 +10,7 @@ function mapUser(u: { id: string; firstName: string; lastName: string; email: st
     email: u.email,
     role: u.role as UserRole,
     status: u.status as UserStatus,
+    avatarUrl: u.avatarUrl,
     avatarColor: u.avatarColor,
     timezone: u.timezone,
     language: u.language,
