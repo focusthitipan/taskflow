@@ -64,7 +64,7 @@ export default function GraphPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       {data.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
               label: "Avg Productivity",
@@ -87,7 +87,7 @@ export default function GraphPage() {
               className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow"
             >
               <p className="text-sm text-secondaryGray-600 font-normal">{stat.label}</p>
-              <p className={`text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
+              <p className={`text-[24px] sm:text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
                 {stat.value}
               </p>
             </div>
@@ -100,7 +100,7 @@ export default function GraphPage() {
         {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
-            <h3 className="text-xl font-bold text-secondaryGray-900 dark:text-white">
+            <h3 className="text-lg sm:text-xl font-bold text-secondaryGray-900 dark:text-white">
               Daily Performance
             </h3>
             <p className="text-xs text-secondaryGray-600 font-normal mt-0.5">
@@ -190,7 +190,7 @@ export default function GraphPage() {
       {/* Data table */}
       {!loading && data.length > 0 && (
         <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow overflow-x-auto custom-scrollbar">
-          <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-secondaryGray-900 dark:text-white mb-4">
             Hourly Data
           </h3>
           <table className="w-full min-w-[500px]">

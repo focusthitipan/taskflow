@@ -46,7 +46,7 @@ export default function TeamPage() {
   return (
     <div className="space-y-6">
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
           { label: "Team Members", value: members.length, color: "text-brand-500" },
           { label: "Online Now", value: onlineCount, color: "text-green-500" },
@@ -57,7 +57,7 @@ export default function TeamPage() {
             className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow"
           >
             <p className="text-sm text-secondaryGray-600 font-normal">{stat.label}</p>
-            <p className={`text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
+            <p className={`text-[24px] sm:text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
               {stat.value}
             </p>
           </div>
@@ -66,10 +66,10 @@ export default function TeamPage() {
 
       {/* Member cards */}
       <div>
-        <h2 className="text-2xl font-bold text-secondaryGray-900 dark:text-white mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-4">
           Team Members
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {members.map((member) => (
             <MemberCard key={member.id} member={member} />
           ))}
@@ -84,7 +84,7 @@ export default function TeamPage() {
 
       {/* Team Performance Chart */}
       <div className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow">
-        <h3 className="text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
+        <h3 className="text-lg sm:text-xl font-bold text-secondaryGray-900 dark:text-white mb-5">
           Task Distribution
         </h3>
         <ResponsiveContainer width="100%" height={280}>

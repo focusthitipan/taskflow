@@ -31,9 +31,9 @@ export function FilterBar({ filters, onFiltersChange }: FilterBarProps) {
     onFiltersChange({ search: "", priority: "all", status: "all" });
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
       {/* Search */}
-      <div className="flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-800 flex-1 min-w-[200px] max-w-xs">
+      <div className="flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white dark:bg-navy-800 flex-1 min-w-[160px] sm:min-w-[200px] sm:max-w-xs">
         <Search className="w-4 h-4 text-secondaryGray-600 flex-shrink-0" />
         <input
           value={filters.search}

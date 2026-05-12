@@ -393,7 +393,7 @@ function AppearanceTab() {
         <h3 className="text-lg font-bold text-secondaryGray-900 dark:text-white mb-3">
           Color Mode
         </h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {themes.map((t) => {
             const Icon = t.icon;
             return (
@@ -718,7 +718,7 @@ export default function SettingsPage() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[260px_1fr] gap-5">
       {/* Tab nav */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-3 card-shadow h-fit">
+      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-3 card-shadow h-fit xl:sticky xl:top-[140px]">
         {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -744,8 +744,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab content */}
-      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-6 card-shadow">
-        <h2 className="text-2xl font-bold text-secondaryGray-900 dark:text-white mb-6">
+      <div className="bg-white dark:bg-navy-800 rounded-[20px] p-4 sm:p-6 card-shadow">
+        <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white mb-6">
           {visibleTabs.find((t) => t.id === activeTab)?.label}
         </h2>
         {renderTab()}

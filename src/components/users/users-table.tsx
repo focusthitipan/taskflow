@@ -71,7 +71,7 @@ export function UsersTable({
           <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-secondaryGray-100 dark:border-white/10">
-                <th className="text-left px-5 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
+                <th className="text-left px-3 sm:px-5 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
                   <button
                     onClick={() => handleSort("name")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
@@ -79,7 +79,7 @@ export function UsersTable({
                     User<SortIcon column="name" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden md:table-cell">
+                <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden md:table-cell">
                   <button
                     onClick={() => handleSort("email")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
@@ -87,7 +87,7 @@ export function UsersTable({
                     Email<SortIcon column="email" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
+                <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
                   <button
                     onClick={() => handleSort("role")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
@@ -95,10 +95,10 @@ export function UsersTable({
                     Role<SortIcon column="role" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
+                <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
                   Status
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden lg:table-cell">
+                <th className="text-left px-3 sm:px-4 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase hidden lg:table-cell">
                   <button
                     onClick={() => handleSort("createdAt")}
                     className="hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
@@ -106,7 +106,7 @@ export function UsersTable({
                     Joined<SortIcon column="createdAt" />
                   </button>
                 </th>
-                <th className="text-right px-5 py-4 text-xs font-normal text-secondaryGray-600 uppercase">
+                <th className="text-right px-3 sm:px-5 py-3 sm:py-4 text-xs font-normal text-secondaryGray-600 uppercase">
                   Actions
                 </th>
               </tr>
@@ -120,10 +120,10 @@ export function UsersTable({
                     key={user.id}
                     className="border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150"
                   >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
+                    <td className="px-3 sm:px-5 py-3 sm:py-4">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0"
                           style={{ backgroundColor: user.avatarColor || "#422AFB" }}
                         >
                           {user.firstName[0]}
@@ -134,15 +134,15 @@ export function UsersTable({
                         </p>
                       </div>
                     </td>
-                    <td className="px-4 py-4 hidden md:table-cell">
+                    <td className="px-3 sm:px-4 py-3 sm:py-4 hidden md:table-cell">
                       <span className="text-sm text-secondaryGray-600 font-normal">{user.email}</span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 sm:px-4 py-3 sm:py-4">
                       <span className={cn("text-xs font-bold px-2 py-1 rounded-[10px]", rc.bg, rc.text)}>
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 sm:px-4 py-3 sm:py-4">
                       <span
                         className={cn(
                           "flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-[10px] w-fit",
@@ -154,7 +154,7 @@ export function UsersTable({
                         {user.status}
                       </span>
                     </td>
-                    <td className="px-4 py-4 hidden lg:table-cell">
+                    <td className="px-3 sm:px-4 py-3 sm:py-4 hidden lg:table-cell">
                       <span className="text-sm text-secondaryGray-600 font-normal">
                         {new Date(user.createdAt).toLocaleDateString("en-US", {
                           month: "short",
@@ -163,19 +163,19 @@ export function UsersTable({
                         })}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2 justify-end">
+                    <td className="px-3 sm:px-5 py-4">
+                      <div className="flex items-center gap-1 sm:gap-2 justify-end">
                         <button
                           onClick={() => onEdit(user)}
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-brand-500 hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-colors duration-150"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           onClick={() => onDelete(user)}
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors duration-150"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors duration-150"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                       </div>
                     </td>
@@ -187,7 +187,7 @@ export function UsersTable({
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-5 py-4 border-t border-secondaryGray-100 dark:border-white/10">
+        <div className="flex items-center justify-between px-3 sm:px-5 py-3 sm:py-4 border-t border-secondaryGray-100 dark:border-white/10 flex-wrap gap-2">
           <p className="text-xs text-secondaryGray-600 font-normal">
             Showing {(pagination.page - 1) * pagination.limit + 1}–
             {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}

@@ -79,7 +79,7 @@ export function SummaryWidgets({ tasks }: SummaryWidgetsProps) {
                 <Icon className={`w-5 h-5 ${w.iconColor}`} />
               </div>
             </div>
-            <p className={`text-[34px] font-bold leading-none ${w.valueColor}`}>{w.value}</p>
+            <p className={`text-[24px] sm:text-[34px] font-bold leading-none ${w.valueColor}`}>{w.value}</p>
           </div>
         );
       })}

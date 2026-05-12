@@ -99,7 +99,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {[
           { label: "Total Users", value: pagination.total, color: "text-brand-500" },
           { label: "Active", value: activeCount, color: "text-green-500" },
@@ -110,7 +110,7 @@ export default function UsersPage() {
             className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow"
           >
             <p className="text-sm text-secondaryGray-600 font-normal">{stat.label}</p>
-            <p className={`text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
+            <p className={`text-[24px] sm:text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
               {stat.value}
             </p>
           </div>
@@ -118,14 +118,14 @@ export default function UsersPage() {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-secondaryGray-900 dark:text-white">All Users</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-secondaryGray-900 dark:text-white">All Users</h2>
         <button
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand transition-all duration-250 ease"
         >
           <UserPlus className="w-4 h-4" />
-          Add User
+          <span className="hidden 2sm:inline">Add User</span>
         </button>
       </div>
 

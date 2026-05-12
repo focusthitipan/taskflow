@@ -85,7 +85,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-navy-800 rounded-[30px] p-8 card-shadow">
+        <div className="bg-white dark:bg-navy-800 rounded-[30px] p-5 sm:p-8 card-shadow">
           <div className="mb-6">
             <h1 className="text-[28px] font-bold text-secondaryGray-900 dark:text-white leading-none mb-2">
               Welcome back
@@ -165,7 +165,7 @@ export default function LoginPage() {
             <p className="text-xs text-secondaryGray-600 text-center mb-3 font-normal">
               Demo accounts — click to fill
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 2sm:grid-cols-2 gap-2">
               {DEMO_ACCOUNTS.map((acc) => (
                 <button
                   key={acc.email}

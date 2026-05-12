@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Bell, Search, LogOut, User, Settings, ChevronDown } from "lucide-react";
+import { Bell, Search, LogOut, User, Settings, ChevronDown, Menu } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useSidebar } from "./sidebar-context";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ const PAGE_TITLES: Record<string, string> = {
 export function Topbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { collapsed } = useSidebar();
+  const { collapsed, toggleMobile, isMobile } = useSidebar();
   const [notifOpen, setNotifOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -59,7 +59,7 @@ export function Topbar() {
     .toUpperCase()
     .slice(0, 2);
 
-  const sidebarWidth = collapsed ? 72 : 300;
+  const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 300;
 
   const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -81,35 +81,47 @@ export function Topbar() {
 
   return (
     <div
-      className="fixed top-5 right-5 z-30 transition-all duration-200"
-      style={{ left: `${sidebarWidth + 20}px` }}
+      className="fixed top-3 sm:top-5 right-3 sm:right-5 z-30 transition-all duration-200"
+      style={{ left: isMobile ? "12px" : `${sidebarWidth + 20}px` }}
     >
-      <div className="glass-navbar dark:glass-navbar rounded-2xl px-6 min-h-[75px] flex items-center justify-between gap-4">
-        {/* Page title */}
-        <div>
-          <h1 className="text-[34px] font-bold text-secondaryGray-900 dark:text-white leading-none">
-            {title}
-          </h1>
-          <p className="text-sm text-secondaryGray-600 font-normal mt-1">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+      <div className="glass-navbar dark:glass-navbar rounded-2xl px-4 sm:px-6 min-h-[60px] sm:min-h-[75px] flex items-center justify-between gap-4">
+        {/* Left: hamburger + title */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Hamburger — mobile only */}
+          {isMobile && (
+            <button
+              onClick={toggleMobile}
+              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-secondaryGray-700 dark:text-white hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
+          <div className="min-w-0">
+            <h1 className="text-[22px] sm:text-[28px] md:text-[34px] font-bold text-secondaryGray-900 dark:text-white leading-none truncate">
+              {title}
+            </h1>
+            <p className="text-xs sm:text-sm text-secondaryGray-600 font-normal mt-1 hidden 2sm:block">
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
         </div>
 
         {/* Right controls */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Search */}
-          <div className="hidden md:flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white/60 dark:bg-navy-700/60 min-w-[200px]">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* Search — hidden on small screens, shown as icon button on mobile */}
+          <div className="hidden md:flex items-center gap-2 h-[44px] px-4 rounded-2xl border border-secondaryGray-100 dark:border-white/10 bg-white/60 dark:bg-navy-700/60 min-w-[180px] lg:min-w-[200px]">
             <Search className="w-4 h-4 text-secondaryGray-600 flex-shrink-0" />
             <input
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search..."
-              className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none"
+              className="bg-transparent text-sm text-secondaryGray-900 dark:text-white placeholder:text-secondaryGray-600 placeholder:font-normal flex-1 border-none min-w-0"
             />
           </div>
 
@@ -121,12 +133,12 @@ export function Topbar() {
                 setAvatarOpen(false);
                 if (!notifOpen) fetchNotifications();
               }}
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150 relative"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150 relative"
             >
-              <Bell className="w-5 h-5 text-secondaryGray-700 dark:text-white" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-secondaryGray-700 dark:text-white" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
-                  {unreadCount}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </button>
@@ -137,8 +149,8 @@ export function Topbar() {
                   className="fixed inset-0 z-40"
                   onClick={() => setNotifOpen(false)}
                 />
-                <div className="absolute right-0 top-12 z-50 w-[340px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10">
+                <div className="absolute right-0 top-12 z-50 w-[300px] sm:w-[340px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden">
+                  <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10">
                     <p className="font-bold text-secondaryGray-900 dark:text-white text-sm">
                       Notifications
                       {unreadCount > 0 && (
@@ -156,7 +168,7 @@ export function Topbar() {
                       </button>
                     )}
                   </div>
-                  <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                  <div className="max-h-[280px] sm:max-h-[300px] overflow-y-auto custom-scrollbar">
                     {notifLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="w-5 h-5 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
@@ -171,7 +183,7 @@ export function Topbar() {
                           key={n.id}
                           onClick={() => markRead(n.id)}
                           className={cn(
-                            "w-full text-left px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150",
+                            "w-full text-left px-4 sm:px-5 py-4 border-b border-secondaryGray-100 dark:border-white/10 last:border-0 hover:bg-secondaryGray-300 dark:hover:bg-navy-700 transition-colors duration-150",
                             !n.read && "bg-brand-100/30 dark:bg-brand-900/20"
                           )}
                         >
@@ -219,15 +231,15 @@ export function Topbar() {
                 setAvatarOpen(!avatarOpen);
                 setNotifOpen(false);
               }}
-              className="flex items-center gap-2 h-10 px-3 rounded-full bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150"
+              className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 rounded-full bg-white dark:bg-navy-700 hover:bg-secondaryGray-400 dark:hover:bg-navy-900 transition-colors duration-150"
             >
-              <div className="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full gradient-brand flex items-center justify-center text-white text-xs font-bold">
                 {userInitials}
               </div>
-              <span className="hidden md:block text-sm font-bold text-secondaryGray-900 dark:text-white">
+              <span className="hidden sm:block text-sm font-bold text-secondaryGray-900 dark:text-white">
                 {userName.split(" ")[0]}
               </span>
-              <ChevronDown className="w-3 h-3 text-secondaryGray-600" />
+              <ChevronDown className="w-3 h-3 text-secondaryGray-600 hidden sm:block" />
             </button>
 
             {avatarOpen && (
@@ -236,12 +248,12 @@ export function Topbar() {
                   className="fixed inset-0 z-40"
                   onClick={() => setAvatarOpen(false)}
                 />
-                <div className="absolute right-0 top-12 z-50 w-[200px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden py-2">
+                <div className="absolute right-0 top-12 z-50 w-[180px] sm:w-[200px] bg-white dark:bg-navy-800 rounded-[20px] card-shadow overflow-hidden py-2">
                   <div className="px-4 py-3 border-b border-secondaryGray-100 dark:border-white/10">
                     <p className="text-sm font-bold text-secondaryGray-900 dark:text-white">
                       {userName}
                     </p>
-                    <p className="text-xs text-secondaryGray-600 font-normal">{user?.email}</p>
+                    <p className="text-xs text-secondaryGray-600 font-normal truncate">{user?.email}</p>
                   </div>
                   <button
                     onClick={() => {

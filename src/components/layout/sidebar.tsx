@@ -35,7 +35,7 @@ const BOTTOM_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { collapsed, toggle } = useSidebar();
+  const { collapsed, toggle, mobileOpen, setMobileOpen, isMobile } = useSidebar();
   const isAdmin = (session?.user as { role?: string })?.role === "admin";
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
@@ -53,6 +53,7 @@ export function Sidebar() {
     return (
       <Link
         href={href}
+        onClick={() => isMobile && setMobileOpen(false)}
         className={cn(
           "flex items-center gap-3 px-4 py-3 rounded-[10px] transition-all duration-150 relative group w-full",
           active
@@ -66,7 +67,7 @@ export function Sidebar() {
             active ? "text-brand-500 dark:text-white" : "text-secondaryGray-600"
           )}
         />
-        {!collapsed && (
+        {(!collapsed || isMobile) && (
           <span
             className={cn(
               "text-sm transition-all duration-150",
@@ -84,12 +85,12 @@ export function Sidebar() {
     );
   };
 
-  return (
+  const sidebarContent = (
     <div
       className={cn(
-        "fixed left-0 top-0 h-full bg-white dark:bg-navy-800 z-40 flex flex-col transition-all duration-300 overflow-hidden",
+        "h-full bg-white dark:bg-navy-800 flex flex-col overflow-hidden",
         "shadow-[14px_17px_40px_4px_rgba(112,144,176,0.08)]",
-        collapsed ? "w-[72px]" : "w-[300px]"
+        isMobile ? "w-[285px]" : collapsed ? "w-[72px]" : "w-[300px]"
       )}
     >
       {/* Logo */}
@@ -99,7 +100,7 @@ export function Sidebar() {
         >
           <Zap className="w-5 h-5 text-white" />
         </div>
-        {!collapsed && (
+        {(!collapsed || isMobile) && (
           <span className="text-xl font-bold text-secondaryGray-900 dark:text-white">
             TaskFlow
           </span>
@@ -114,7 +115,7 @@ export function Sidebar() {
 
         {isAdmin && (
           <>
-            {!collapsed && (
+            {(!collapsed || isMobile) && (
               <p className="text-[10px] font-bold text-secondaryGray-600 uppercase tracking-wider px-4 pt-4 pb-1">
                 Admin
               </p>
@@ -132,21 +133,56 @@ export function Sidebar() {
           <NavItem key={item.href} {...item} />
         ))}
 
-        {/* Collapse toggle */}
-        <button
-          onClick={toggle}
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-[10px] text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-5 h-5 flex-shrink-0" />
-          ) : (
-            <>
-              <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm font-normal">Collapse</span>
-            </>
-          )}
-        </button>
+        {/* Collapse toggle — desktop only */}
+        {!isMobile && (
+          <button
+            onClick={toggle}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-[10px] text-secondaryGray-600 hover:text-secondaryGray-900 dark:hover:text-white transition-colors duration-150"
+          >
+            {collapsed ? (
+              <ChevronRight className="w-5 h-5 flex-shrink-0" />
+            ) : (
+              <>
+                <ChevronLeft className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-normal">Collapse</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
+    </div>
+  );
+
+  // Mobile: slide-in drawer with backdrop
+  if (isMobile) {
+    return (
+      <>
+        {/* Backdrop */}
+        <div
+          className={cn(
+            "fixed inset-0 bg-black/40 z-40 transition-opacity duration-300",
+            mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}
+          onClick={() => setMobileOpen(false)}
+        />
+
+        {/* Drawer */}
+        <div
+          className={cn(
+            "fixed left-0 top-0 h-full z-50 transition-transform duration-330 ease-sidebar",
+            mobileOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          {sidebarContent}
+        </div>
+      </>
+    );
+  }
+
+  // Desktop: fixed sidebar
+  return (
+    <div className="fixed left-0 top-0 h-full z-40 transition-all duration-300">
+      {sidebarContent}
     </div>
   );
 }

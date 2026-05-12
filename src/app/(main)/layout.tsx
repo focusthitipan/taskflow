@@ -12,7 +12,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
           <MainContent>
             <Topbar />
-            <main className="pt-[130px] px-5 md:px-8 pb-8">{children}</main>
+            <main className="pt-[100px] sm:pt-[120px] md:pt-[130px] px-3 sm:px-5 md:px-8 pb-8">
+              {children}
+            </main>
           </MainContent>
         </div>
       </SidebarProvider>

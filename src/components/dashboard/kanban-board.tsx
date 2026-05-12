@@ -182,15 +182,16 @@ export function KanbanBoard({ tasks, onTasksChange }: KanbanBoardProps) {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-5 overflow-x-auto lg:overflow-x-visible custom-scrollbar snap-x snap-mandatory lg:snap-none -mx-3 sm:mx-0 px-3 sm:px-0">
           {COLUMNS.map((column) => (
-            <DroppableColumn
-              key={column.id}
-              column={column}
-              tasks={tasksByColumn(column.id)}
-              onTaskClick={setSelectedTask}
-              isOver={overColumn === column.id}
-            />
+            <div key={column.id} className="min-w-[85vw] sm:min-w-[320px] lg:min-w-0 snap-center lg:snap-align-none">
+              <DroppableColumn
+                column={column}
+                tasks={tasksByColumn(column.id)}
+                onTaskClick={setSelectedTask}
+                isOver={overColumn === column.id}
+              />
+            </div>
           ))}
         </div>
 

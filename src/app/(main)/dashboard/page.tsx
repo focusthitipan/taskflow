@@ -85,7 +85,7 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Stats row — shows total counts from API, not just current page */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {[
           { label: "To Do", count: counts.todo, color: "text-secondaryGray-600" },
           { label: "In Progress", count: counts.in_progress, color: "text-orange-500" },
@@ -96,7 +96,7 @@ export default function DashboardPage() {
             className="bg-white dark:bg-navy-800 rounded-[20px] p-5 card-shadow"
           >
             <p className="text-sm text-secondaryGray-600 font-normal">{stat.label}</p>
-            <p className={`text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
+            <p className={`text-[24px] sm:text-[34px] font-bold leading-none mt-1 ${stat.color}`}>
               {stat.count}
             </p>
           </div>
@@ -104,21 +104,21 @@ export default function DashboardPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4 mb-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
         <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
         <button
           onClick={() => setShowNewTask(true)}
           className="flex items-center gap-2 h-[44px] px-5 rounded-full text-sm font-bold text-white gradient-brand flex-shrink-0 transition-all duration-250 ease"
         >
           <Plus className="w-4 h-4" />
-          New Task
+          <span className="hidden 2sm:inline">New Task</span>
           <span className="hidden md:block text-xs opacity-70 font-normal">(N)</span>
         </button>
       </div>
 
       {/* Kanban Board */}
       {loading ? (
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-[20px] bg-secondaryGray-300/50 dark:bg-navy-900/50 p-4 space-y-3">
               {[1, 2].map((j) => (
