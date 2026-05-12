@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs" alt="Next.js" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma" alt="Prisma" />
   <img src="https://img.shields.io/badge/NextAuth-4-6C47FF?logo=nextdotjs" alt="NextAuth" />
@@ -116,7 +116,7 @@ src/
 │   ├── notify.ts              # ตัวช่วยการแจ้งเตือน
 │   ├── utils.ts               # cn(), ฟังก์ชันจัดรูปแบบ
 │   └── i18n/                  # คำแปล EN / TH
-└── middleware.ts              # NextAuth middleware
+└── proxy.ts                   # NextAuth proxy (Next.js 16)
 ```
 
 ---
@@ -135,7 +135,7 @@ TaskFlow ใช้ระบบบทบาท 3 ระดับ:
 
 | ชั้น | กลไก |
 |---|---|
-| **Middleware** | `next-auth/middleware` — ทุกหน้าต้องล็อกอิน |
+| **Proxy** | `next-auth/middleware` ผ่าน `src/proxy.ts` — ทุกหน้าต้องล็อกอิน (Next.js 16) |
 | **Page** | Redirect non-admin ออกจาก `/users` |
 | **UI** | Sidebar ซ่อนเมนู Admin; Settings ซ่อนแท็บ Admin |
 | **API** | `requireAuth()` / `requireAdmin()` ตรวจสอบทุก API route |
@@ -235,7 +235,7 @@ npm run dev
 
 | หมวดหมู่ | เทคโนโลยี |
 |---|---|
-| **Framework** | [Next.js 15](https://nextjs.org/) (App Router) |
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) |
 | **ภาษา** | [TypeScript 5](https://www.typescriptlang.org/) |
 | **ORM** | [Prisma 7](https://www.prisma.io/) |
 | **ฐานข้อมูล** | PostgreSQL |

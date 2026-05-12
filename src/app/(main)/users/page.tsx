@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { UserPlus, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { UsersTable } from "@/components/users/users-table";
 import { UserModal } from "@/components/users/user-modal";
 import { DeleteUserDialog } from "@/components/users/delete-user-dialog";
@@ -20,6 +20,7 @@ interface PaginationMeta {
 export default function UsersPage() {
   const { t } = useT();
   const { data: session } = useSession();
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta>({ page: 1, limit: 10, total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
@@ -38,9 +39,9 @@ export default function UsersPage() {
 
   useEffect(() => {
     if (session && !isAdmin) {
-      redirect("/dashboard");
+      router.replace("/dashboard");
     }
-  }, [session, isAdmin]);
+  }, [session, isAdmin, router]);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -55,8 +56,9 @@ export default function UsersPage() {
       params.set("sort_dir", sortDir);
 
       const res = await fetch(`/api/users?${params}`);
+      if (!res.ok) return;
       const data = await res.json();
-      setUsers(data.users);
+      setUsers(data.users ?? []);
       if (data.pagination) setPagination(data.pagination);
     } catch (err) {
       console.error(err);

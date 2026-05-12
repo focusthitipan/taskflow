@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Command,
@@ -91,7 +92,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 gap-0 max-w-[520px] rounded-[20px] bg-white dark:bg-navy-800 border-0 card-shadow">
+      <DialogContent aria-describedby={undefined} className="p-0 gap-0 max-w-[520px] rounded-[20px] bg-white dark:bg-navy-800 border-0 card-shadow">
+        <DialogTitle className="sr-only">Search tasks</DialogTitle>
         <Command shouldFilter={false} className="rounded-[20px]">
           <div className="flex items-center border-b border-secondaryGray-100 dark:border-white/10 px-5">
             <Search className="w-4 h-4 text-secondaryGray-600 flex-shrink-0 mr-2" />
