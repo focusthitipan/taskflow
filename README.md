@@ -50,11 +50,33 @@
 ## 🖼️ ภาพหน้าจอ
 
 <p align="center">
-  <img src="screens/kanban.jpg" alt="Dashboard — บอร์ด Kanban" width="100%" />
+  <strong>📋 Dashboard — บอร์ด Kanban</strong><br/>
+  <img src="screens/kanban.jpg" alt="Dashboard Kanban Board" width="100%" />
 </p>
 
 <p align="center">
-  <img src="screens/calendar.jpg" alt="My Tasks — มุมมองปฏิทิน" width="100%" />
+  <strong>📅 My Tasks — มุมมองปฏิทิน</strong><br/>
+  <img src="screens/calendar.jpg" alt="My Tasks Calendar View" width="100%" />
+</p>
+
+<p align="center">
+  <strong>👥 Team — สมาชิกทีม & ภาระงาน</strong><br/>
+  <img src="screens/team.jpg" alt="Team Members & Workload" width="100%" />
+</p>
+
+<p align="center">
+  <strong>📊 Daily Graph — Productivity · Energy · Focus</strong><br/>
+  <img src="screens/daily-graph.jpg" alt="Daily Graph 3-axis Chart" width="100%" />
+</p>
+
+<p align="center">
+  <strong>👑 User Management — จัดการผู้ใช้ (Admin)</strong><br/>
+  <img src="screens/user-management.jpg" alt="User Management Admin" width="100%" />
+</p>
+
+<p align="center">
+  <strong>🔐 หน้าเข้าสู่ระบบ</strong><br/>
+  <img src="screens/login.jpg" alt="Login Page" width="100%" />
 </p>
 
 ---
