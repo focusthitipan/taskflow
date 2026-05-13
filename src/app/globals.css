@@ -133,12 +133,15 @@
   .glass-navbar {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    background: rgba(244, 247, 254, 0.2);
-    border: 1.5px solid transparent;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1.5px solid rgba(112, 144, 176, 0.14);
+    box-shadow: 0 4px 24px rgba(112, 144, 176, 0.12);
   }
 
   .dark .glass-navbar {
-    background: rgba(11, 20, 55, 0.5);
+    background: rgba(11, 20, 55, 0.72);
+    border: 1.5px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
   }
 
   .gradient-brand {
